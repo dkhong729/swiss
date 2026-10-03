@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ORBIO - A Virtual Organoid for Biology in Orbit</title>
+    <meta
+      name="description"
+      content="A public, visual explanation of ORBIO, a prototype virtual organoid for exploring biology in orbit."
+    >
+    <link rel="stylesheet" href="src/styles.css">
+    <script type="module" src="src/main.js"></script>
+  </head>
+  <body data-page="model">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-nav" data-nav>
+      <a class="wordmark" href="./" aria-label="ORBIO home">
+        <span class="wordmark-mark"></span>
+        <span>ORBIO</span>
+      </a>
+      <nav aria-label="Primary">
+        <a class="active" href="./">The Model</a>
+        <a href="explore/">Explore Results</a>
+        <a href="README.md">Technical Notes</a>
+      </nav>
+      <div class="scroll-progress" data-progress></div>
+    </header>
+
+    <main id="main">
+      <section class="hero model-hero" aria-labelledby="hero-title">
+        <div class="hero-copy" data-reveal>
+          <p class="eyebrow">Organoid Response and Biology in Orbit</p>
+          <h1 id="hero-title">ORBIO</h1>
+          <p class="hero-line">A virtual organoid for biology in orbit.</p>
+          <p class="hero-subline">
+            Explore thousands of biological conditions in software, then decide
+            what is worth testing in flight.
+          </p>
+          <p class="system-line">Physics-informed simulation / AI representation / real-data calibration</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#how">Explore the model</a>
+            <a class="button secondary" href="explore/">See the results</a>
+          </div>
+        </div>
+        <figure class="hero-media" data-reveal>
+          <video
+            data-hero-video
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="metadata"
+            poster="/public/media/orbio_day1_day7_poster.png"
+            aria-label="Simulator-rendered organoid growth from day 1 to day 7"
+          >
+            <source src="public/media/orbio_day1_day7.webm" type="video/webm">
+            <source src="public/media/orbio_day1_day7.mp4" type="video/mp4">
+          </video>
+          <figcaption>
+            <span>DAY 1</span>
+            <span class="day-line"></span>
+            <span>DAY 7</span>
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="section split-problem" aria-labelledby="problem-title">
+        <div class="section-kicker">Why the problem exists</div>
+        <h2 id="problem-title">We can fly biology. We cannot observe every possibility.</h2>
+        <div class="environment-map" aria-label="Ground, RPM and real flight comparison">
+          <article class="env-stage" tabindex="0" data-env="ground">
+            <svg viewBox="0 0 320 260" role="img" aria-label="Ground 1g organoid transport diagram">
+              <defs>
+                <linearGradient id="groundO2" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0" stop-color="#d7f3f0"/>
+                  <stop offset="1" stop-color="#f7f4ee"/>
+                </linearGradient>
+              </defs>
+              <rect x="8" y="8" width="304" height="244" rx="0" fill="url(#groundO2)" stroke="#16324a" opacity=".86"/>
+              <path d="M56 46 v96" stroke="#17324a" stroke-width="4"/>
+              <path d="M42 126 l14 22 14-22" fill="none" stroke="#17324a" stroke-width="4"/>
+              <ellipse cx="170" cy="186" rx="74" ry="34" fill="#0f79c8" opacity=".22"/>
+              <g fill="none" stroke="#19a28b" stroke-width="2" opacity=".8">
+                <path d="M92 112 C126 88 168 88 202 112"/>
+                <path d="M222 118 C248 146 248 174 222 202"/>
+                <path d="M112 202 C84 176 84 146 112 120"/>
+              </g>
+              <path d="M66 218 H268" stroke="#d59a31" stroke-width="8" opacity=".32"/>
+            </svg>
+            <h3>GROUND</h3>
+            <p>Sedimentation, convection and a thinner depleted layer.</p>
+          </article>
+          <article class="env-stage" tabindex="0" data-env="rpm">
+            <svg viewBox="0 0 320 260" role="img" aria-label="RPM analogue diagram">
+              <rect x="8" y="8" width="304" height="244" fill="#f7f4ee" stroke="#16324a" opacity=".86"/>
+              <circle cx="160" cy="130" r="78" fill="none" stroke="#0f79c8" stroke-width="2" stroke-dasharray="5 8"/>
+              <path d="M160 52 a78 78 0 0 1 73 50" fill="none" stroke="#0f79c8" stroke-width="5"/>
+              <path d="M235 86 l7 25-25-5" fill="none" stroke="#0f79c8" stroke-width="4"/>
+              <ellipse cx="160" cy="134" rx="56" ry="42" fill="#19a28b" opacity=".22"/>
+              <g stroke="#d59a31" stroke-width="2" opacity=".65">
+                <path d="M72 88 C122 120 206 78 250 116"/>
+                <path d="M68 160 C126 128 204 178 252 140"/>
+                <path d="M102 210 C146 184 198 214 238 192"/>
+              </g>
+            </svg>
+            <h3>RPM / CLINOSTAT</h3>
+            <p>Fast analogues. Mixing and shear are visible covariates.</p>
+          </article>
+          <article class="env-stage" tabindex="0" data-env="flight">
+            <svg viewBox="0 0 320 260" role="img" aria-label="Real flight microgravity diagram">
+              <rect x="8" y="8" width="304" height="244" fill="#fbfaf6" stroke="#16324a" opacity=".86"/>
+              <ellipse cx="158" cy="128" rx="62" ry="48" fill="#0f79c8" opacity=".19"/>
+              <ellipse cx="158" cy="128" rx="104" ry="84" fill="none" stroke="#d59a31" stroke-width="12" opacity=".16"/>
+              <g fill="#19a28b" opacity=".65">
+                <circle cx="76" cy="74" r="3"/>
+                <circle cx="248" cy="86" r="2.5"/>
+                <circle cx="232" cy="188" r="3"/>
+                <circle cx="92" cy="190" r="2.5"/>
+              </g>
+              <path d="M94 82 l18 8 -18 8 18 8" fill="none" stroke="#d36d5d" stroke-width="2" opacity=".75"/>
+              <path d="M228 62 l18 8 -18 8 18 8" fill="none" stroke="#d36d5d" stroke-width="2" opacity=".75"/>
+              <path d="M118 224 C148 204 176 244 210 220" fill="none" stroke="#17324a" stroke-width="2" stroke-dasharray="4 6"/>
+            </svg>
+            <h3>REAL FLIGHT</h3>
+            <p>Target condition. Sparse, scarce and not interchangeable with analogues.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section data-gap" aria-labelledby="gap-title">
+        <div>
+          <div class="section-kicker">The data gap</div>
+          <h2 id="gap-title">What happens between measurements?</h2>
+          <p>
+            Many high-information assays are destructive. Flight observations are
+            sparse. ORBIO connects those observations computationally while
+            keeping uncertainty visible.
+          </p>
+        </div>
+        <svg class="trajectory-visual" viewBox="0 0 920 320" role="img" aria-label="Sparse measurements and reconstructed latent trajectory">
+          <path class="unknown-band" d="M94 178 C258 80 410 246 566 124 S786 86 850 174 L850 234 C720 154 612 216 480 206 S238 214 94 256 Z"/>
+          <path class="latent-line" d="M94 214 C252 116 400 256 566 146 S784 106 850 186"/>
+          <g class="measurements">
+            <circle cx="94" cy="214" r="12"/>
+            <circle cx="468" cy="202" r="12"/>
+            <circle cx="850" cy="186" r="12"/>
+          </g>
+          <g class="axis-labels">
+            <text x="70" y="286">DAY 0</text>
+            <text x="438" y="286">DAY 3</text>
+            <text x="816" y="286">DAY 7</text>
+          </g>
+        </svg>
+      </section>
+
+      <section class="section how" id="how" aria-labelledby="how-title">
+        <div class="section-kicker">How ORBIO works</div>
+        <h2 id="how-title">One experiment becomes a virtual organoid, then a forecast.</h2>
+        <div class="pipeline-stage" data-pipeline>
+          <div class="pipeline-copy">
+            <ol>
+              <li data-step="0">Experiment: gravity, tissue, morphology, drug, dose, schedule, hardware.</li>
+              <li data-step="1">Virtual organoid: cells, O2, glucose, drug and mechanics evolve together.</li>
+              <li data-step="2">Cell graph: individual cells become nearby graph nodes.</li>
+              <li data-step="3">Organoid state: the graph compresses into a latent representation.</li>
+              <li data-step="4">Future prediction: day-1 state plus condition points to day-7 phenotype.</li>
+            </ol>
+            <p class="mini-equation">G_day1 -> z1 -> z7 -> phenotype</p>
+          </div>
+          <svg class="pipeline-visual" viewBox="0 0 880 520" role="img" aria-label="ORBIO pipeline transformation">
+            <g class="experiment-controls">
+              <rect x="52" y="78" width="176" height="322"/>
+              <text x="86" y="120">EXPERIMENT</text>
+              <path d="M84 158 H194 M84 198 H176 M84 238 H208 M84 278 H164 M84 318 H188 M84 358 H150" />
+            </g>
+            <g class="organoid-cloud">
+              <circle cx="382" cy="242" r="86"/>
+              <circle cx="342" cy="214" r="18"/>
+              <circle cx="392" cy="196" r="15"/>
+              <circle cx="430" cy="244" r="20"/>
+              <circle cx="358" cy="278" r="17"/>
+              <circle cx="400" cy="300" r="14"/>
+              <path d="M292 330 C340 286 420 364 474 318"/>
+            </g>
+            <g class="graph-nodes">
+              <path d="M572 188 L630 220 L604 290 L524 282 L500 220 Z"/>
+              <circle cx="572" cy="188" r="12"/>
+              <circle cx="630" cy="220" r="12"/>
+              <circle cx="604" cy="290" r="12"/>
+              <circle cx="524" cy="282" r="12"/>
+              <circle cx="500" cy="220" r="12"/>
+            </g>
+            <g class="latent-orbit">
+              <ellipse cx="728" cy="244" rx="88" ry="38"/>
+              <ellipse cx="728" cy="244" rx="58" ry="92"/>
+              <circle cx="748" cy="206" r="10"/>
+              <path d="M692 336 C732 284 774 286 808 330"/>
+            </g>
+            <g class="flow-lines">
+              <path d="M230 242 C260 238 276 238 300 242"/>
+              <path d="M472 242 C496 226 510 218 536 208"/>
+              <path d="M642 252 C672 252 678 252 696 252"/>
+            </g>
+          </svg>
+        </div>
+      </section>
+
+      <section class="section physics" aria-labelledby="physics-title">
+        <div>
+          <div class="section-kicker">Where physics enters</div>
+          <h2 id="physics-title">Transport changes before biology answers.</h2>
+          <p>
+            The current simulator represents reaction-diffusion, sedimentation,
+            finite medium and radiation. G-jitter and vibration-induced mixing
+            are marked as next work, not current capability.
+          </p>
+          <div class="segmented" role="group" aria-label="Toggle transport condition">
+            <button class="active" type="button" data-physics-mode="one-g">1g</button>
+            <button type="button" data-physics-mode="micro-g">microgravity</button>
+          </div>
+        </div>
+        <div class="transport-visual one-g" data-transport>
+          <svg viewBox="0 0 740 460" role="img" aria-label="Transport cross-section with O2, glucose and drug">
+            <defs>
+              <radialGradient id="o2Field" cx="50%" cy="46%" r="58%">
+                <stop offset="0" stop-color="#d59a31" stop-opacity=".28"/>
+                <stop offset=".54" stop-color="#80d4d0" stop-opacity=".28"/>
+                <stop offset="1" stop-color="#f7f4ee" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <rect x="0" y="0" width="740" height="460" fill="#fbfaf6"/>
+            <rect class="substrate" x="64" y="358" width="612" height="26"/>
+            <ellipse class="boundary" cx="366" cy="246" rx="220" ry="142"/>
+            <circle class="organoid-core" cx="366" cy="246" r="92"/>
+            <circle cx="366" cy="246" r="174" fill="url(#o2Field)"/>
+            <g class="particles">
+              <circle cx="166" cy="116" r="5"/><circle cx="238" cy="92" r="3"/><circle cx="580" cy="128" r="5"/>
+              <circle cx="616" cy="288" r="4"/><circle cx="118" cy="284" r="4"/><circle cx="512" cy="90" r="3"/>
+            </g>
+            <g class="transport-arrows">
+              <path d="M146 210 C218 164 274 170 322 200"/>
+              <path d="M592 220 C522 168 468 174 420 206"/>
+              <path d="M366 78 v86"/>
+            </g>
+            <text x="84" y="82">O2 / glucose / drug</text>
+            <text class="mode-label" x="84" y="418">1g: settled organoid, thinner boundary layer, convection present</text>
+          </svg>
+        </div>
+      </section>
+
+      <section class="section data-model" aria-labelledby="data-model-title">
+        <div class="section-kicker">From real data to model priors</div>
+        <h2 id="data-model-title">Data can set direction. The magnitude still has assumptions.</h2>
+        <div class="flow-strip" aria-label="NASA omics data to ORBIO model prior flow">
+          <span>NASA / public flight data</span>
+          <span>transcriptomics</span>
+          <span>gene programs</span>
+          <span>microgravity effect</span>
+          <span>model prior</span>
+          <span>ORBIO</span>
+        </div>
+        <p class="numeric-example">
+          Neural proliferation program:
+          <strong data-neural-delta>Delta score -0.62</strong>
+          mapped to proliferation multiplier
+          <strong data-neural-multiplier>0.911</strong>.
+        </p>
+        <p class="caveat">Direction supported by data; mapping magnitude remains model-dependent.</p>
+      </section>
+
+      <section class="section funnel" aria-labelledby="funnel-title">
+        <div class="section-kicker">From possibilities to flight</div>
+        <h2 id="funnel-title">Thousands of virtual conditions should become a smaller, better flight question.</h2>
+        <div class="funnel-visual" data-funnel aria-label="Virtual scenario funnel">
+          <div class="scenario-dots" data-funnel-dots></div>
+          <div class="funnel-neck"></div>
+          <div class="flight-window">flight opportunity</div>
+        </div>
+        <p>
+          The scarce resource is not rocket mass alone. It is iteration time and
+          high-quality biological information.
+        </p>
+      </section>
+
+      <section class="section closed-loop" aria-labelledby="loop-title">
+        <div>
+          <div class="section-kicker">Closed loop</div>
+          <h2 id="loop-title">Every experiment should make the next model less wrong.</h2>
+        </div>
+        <svg class="loop-visual" viewBox="0 0 720 520" role="img" aria-label="ORBIO closed-loop diagram">
+          <circle cx="360" cy="260" r="170" fill="none" stroke="#16324a" stroke-width="1.4" stroke-dasharray="4 10"/>
+          <g class="loop-items">
+            <text x="298" y="76">GROUND DATA</text>
+            <text x="538" y="168">ORBIO</text>
+            <text x="492" y="384">VIRTUAL EXPERIMENTS</text>
+            <text x="238" y="468">SELECT FLIGHT</text>
+            <text x="72" y="338">REAL FLIGHT</text>
+            <text x="88" y="172">NEW DATA</text>
+          </g>
+          <path class="orbiting-line" d="M360 90 C552 92 610 304 478 424 C316 552 94 412 126 224 C154 62 306 58 360 90"/>
+          <circle class="orbiting-dot" cx="360" cy="90" r="8"/>
+          <text x="310" y="266" class="center-label">RPM / imaging / omics / medium telemetry</text>
+        </svg>
+      </section>
+
+      <section class="section is-not" aria-labelledby="truth-title">
+        <h2 id="truth-title">What ORBIO is, and what it is not.</h2>
+        <div class="contrast-columns">
+          <div>
+            <h3>ORBIO is</h3>
+            <p>a research prototype</p>
+            <p>a multiscale virtual experiment engine</p>
+            <p>uncertainty-aware</p>
+            <p>a bridge between analogues and real flight</p>
+          </div>
+          <div>
+            <h3>ORBIO is not</h3>
+            <p>a replacement for flight experiments</p>
+            <p>a clinically validated predictor</p>
+            <p>a complete first-principles model</p>
+            <p>proof that a drug will behave a certain way in orbit</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section final-cta" aria-labelledby="break-title">
+        <h2 id="break-title">We built the model. Now break it.</h2>
+        <a class="button primary" href="explore/">Explore the results</a>
+      </section>
+    </main>
+  </body>
+</html>

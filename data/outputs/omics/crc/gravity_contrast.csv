@@ -1,0 +1,17 @@
+tissue,program,delta,sd,n_ug,n_ref,layer
+crc_tumor_organoid,proliferation,0.46508131819,0.49546871905215467,4,4,combined
+crc_tumor_organoid,apoptosis,-0.15997327657822152,0.2572763639975586,4,4,combined
+crc_tumor_organoid,anti_apoptosis,-0.163667553776413,0.19129070204279786,4,4,combined
+crc_tumor_organoid,hypoxia,0.1145579800136083,0.3670883589285328,4,4,combined
+crc_tumor_organoid,glycolysis,-0.15680235807698323,0.3586503501952954,4,4,combined
+crc_tumor_organoid,adhesion,-0.02011611000264104,0.15788393160092754,4,4,combined
+crc_tumor_organoid,oxphos,-0.06418262074815408,0.3718941965968242,4,4,combined
+crc_tumor_organoid,apoptosis_balance,0.003694277198191452,0.28757494521001714,4,4,combined
+crc_tumor_organoid,proliferation,0.46508131819,0.49546871905215467,4,4,transcriptome
+crc_tumor_organoid,apoptosis,-0.15997327657822152,0.2572763639975586,4,4,transcriptome
+crc_tumor_organoid,anti_apoptosis,-0.163667553776413,0.19129070204279786,4,4,transcriptome
+crc_tumor_organoid,hypoxia,0.1145579800136083,0.3670883589285328,4,4,transcriptome
+crc_tumor_organoid,glycolysis,-0.15680235807698323,0.3586503501952954,4,4,transcriptome
+crc_tumor_organoid,adhesion,-0.02011611000264104,0.15788393160092754,4,4,transcriptome
+crc_tumor_organoid,oxphos,-0.06418262074815408,0.3718941965968242,4,4,transcriptome
+crc_tumor_organoid,apoptosis_balance,0.003694277198191452,0.28757494521001714,4,4,transcriptome

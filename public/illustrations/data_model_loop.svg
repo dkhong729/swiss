@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900" role="img" aria-labelledby="title desc">
+  <title id="title">Data model loop placeholder</title>
+  <desc id="desc">A closed-loop diagram connecting data, ORBIO, virtual experiments and flight.</desc>
+  <rect width="1400" height="900" fill="#f7f4ee"/>
+  <circle cx="700" cy="450" r="290" fill="none" stroke="#102235" stroke-width="3" stroke-dasharray="8 16" opacity=".55"/>
+  <path d="M700 160 C1034 162 1120 532 890 716 C610 936 226 692 286 370 C336 94 632 106 700 160" fill="none" stroke="#0f79c8" stroke-width="8" opacity=".7"/>
+  <g font-family="Inter,Arial" font-size="34" font-weight="700" fill="#102235">
+    <text x="584" y="118">GROUND DATA</text>
+    <text x="1014" y="304">ORBIO</text>
+    <text x="850" y="712">VIRTUAL EXPERIMENTS</text>
+    <text x="456" y="812">SELECT FLIGHT</text>
+    <text x="160" y="584">REAL FLIGHT</text>
+    <text x="206" y="286">NEW DATA</text>
+  </g>
+  <circle cx="700" cy="160" r="18" fill="#d59a31"/>
+</svg>

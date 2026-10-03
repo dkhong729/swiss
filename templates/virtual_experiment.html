@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f7f4ee">
+    <meta name="description" content="Explore an illustrative ORBIO virtual organoid experiment across gravity, tissue and morphology.">
+    <title>ORBIO — Virtual Experiment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/orbio.css') }}">
+    <script>window.ORBIO_REPOSITORY_OMICS = {{ omics_data | tojson }};</script>
+    <script>window.ORBIO_RUN_METADATA = {{ run_metadata | tojson }};</script>
+    <script type="module" src="{{ url_for('static', filename='js/app.js') }}"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to experiment</a>
+    <header class="site-header">
+      <a class="wordmark" href="/" aria-label="ORBIO virtual experiment home">
+        <span class="wordmark-mark" aria-hidden="true"></span><span>ORBIO</span>
+      </a>
+      <span class="header-context">VIRTUAL EXPERIMENT</span>
+      <span class="demo-label"><span aria-hidden="true"></span>Illustrative demo</span>
+    </header>
+
+    <aside class="experiment-drawer" id="experiment-drawer" aria-label="Experiment design">
+      <div class="drawer-panel">
+        <div class="drawer-heading">
+          <p class="eyebrow">Experiment design</p>
+          <h2>Change the conditions</h2>
+          <p>Selections update the virtual experiment immediately.</p>
+        </div>
+        <fieldset class="control-group">
+          <legend>Gravity</legend>
+          <div class="choice-list" id="gravity-options">
+            <button type="button" data-value="ground_1g" aria-pressed="false">Ground 1g</button>
+            <button type="button" data-value="flight_ug" aria-pressed="true">ISS microgravity</button>
+            <button type="button" data-value="flight_1g_ctrl" aria-pressed="false">ISS 1g centrifuge</button>
+            <button type="button" data-value="sim_ug_rpm" aria-pressed="false">RPM</button>
+            <button type="button" data-value="sim_ug_clinostat" aria-pressed="false">3D clinostat</button>
+          </div>
+        </fieldset>
+        <fieldset class="control-group">
+          <legend>Tissue</legend>
+          <label class="sr-only" for="tissue-select">Tissue type</label>
+          <select id="tissue-select">
+            <option value="generic">Generic organoid</option>
+            <option value="neural">Neural organoid</option>
+            <option value="cardiac">Cardiac organoid</option>
+            <option value="crc_tumor_organoid" selected>Colorectal tumour organoid</option>
+            <option value="cancer_cellline_spheroid">Cancer cell-line spheroid</option>
+          </select>
+        </fieldset>
+        <fieldset class="control-group">
+          <legend>Morphology</legend>
+          <div class="choice-row" id="morphology-options">
+            <button type="button" data-value="solid" aria-pressed="false">Solid</button>
+            <button type="button" data-value="cyst" aria-pressed="true">Cyst</button>
+          </div>
+        </fieldset>
+        <div class="scenario-summary" aria-live="polite">
+          <p class="eyebrow">Current scenario</p>
+          <strong id="scenario-gravity">ISS µg</strong>
+          <span id="scenario-tissue">CRC tumour organoid</span>
+          <span id="scenario-morphology">Cyst</span>
+        </div>
+      </div>
+      <button class="drawer-toggle" id="drawer-toggle" type="button" aria-expanded="false" aria-controls="experiment-drawer">
+        <span class="drawer-icon" aria-hidden="true">＋</span><span>Design experiment</span>
+      </button>
+    </aside>
+
+    <main id="main">
+      <details class="run-details">
+        <summary>Model &amp; run details <span data-run-metadata-state>Loading run metadata…</span></summary>
+        <div class="model-info-grid" id="global-run-info"></div>
+      </details>
+      <section class="experiment-section" aria-labelledby="experiment-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">01 — Virtual experiment</p>
+            <h1 id="experiment-title">From conditions to phenotype.</h1>
+          </div>
+          <p class="scenario-caption" id="scenario-caption">ISS microgravity <span>·</span> Colorectal tumour organoid <span>·</span> Cyst</p>
+        </div>
+        <div class="organoid-stage">
+          <div class="stage-meta">
+            <span class="stage-kicker">Virtual organoid</span>
+            <span class="stage-day" id="stage-day">DAY 0.0</span>
+          </div>
+          <div class="organoid-viewport" id="organoid-viewport">
+            <canvas id="organoid-canvas" aria-label="Three-dimensional virtual organoid"></canvas>
+            <div class="viewer-fallback" id="viewer-fallback" hidden>
+              <canvas id="fallback-canvas" aria-label="Schematic virtual organoid visualization"></canvas>
+              <p>3D preview unavailable — showing a schematic view.</p>
+            </div>
+            <div class="viewer-field-toggles" id="viewer-layer-toggles" aria-label="Unified scene layers">
+              <button type="button" data-layer="cells" aria-pressed="true">Cells</button>
+              <button type="button" data-layer="oxygen" aria-pressed="true">O₂</button>
+              <button type="button" data-layer="glucose" aria-pressed="false">Glucose</button>
+              <button type="button" data-layer="depletion" aria-pressed="true">Depletion</button>
+              <button type="button" data-layer="voxels" aria-pressed="false">Voxels</button>
+            </div>
+            <div class="viewer-cut-modes" id="viewer-cut-modes" role="group" aria-label="Section view mode">
+              <button type="button" data-cut-mode="full" aria-pressed="false">Full 3D</button>
+              <button type="button" data-cut-mode="half" aria-pressed="true">Half cut</button>
+              <button type="button" data-cut-mode="cross" aria-pressed="false">Cross-section</button>
+            </div>
+            <div class="morphology-tag" id="morphology-tag">HOLLOW CYST</div>
+          </div>
+          <div class="timeline">
+            <div class="timeline-controls">
+              <button class="play-button" id="play-toggle" type="button" aria-label="Play trajectory"><span aria-hidden="true">▶</span><span id="play-label">Play</span></button>
+              <label class="timeline-label" for="timeline">Day 0 <span>—</span> Day 7</label>
+              <output id="timeline-day" for="timeline">Day 0.0</output>
+            </div>
+            <input id="timeline" type="range" min="0" max="1" step="0.001" value="0" aria-label="Experiment timeline, day 0 to day 7">
+            <div class="timeline-ticks" aria-hidden="true"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7 days</span></div>
+          </div>
+          <div class="metric-strip" aria-label="Current experiment metrics">
+            <div><span>Est. biological cells</span><strong id="metric-cells">130</strong><small id="metric-representative">~130 representative cells/clusters shown</small></div>
+            <div><span>Growth from Day 0</span><strong id="metric-growth">1.00×</strong><small id="metric-gravity-effect">vs matched 1g · 0%</small></div>
+            <div><span>Hypoxic fraction</span><strong id="metric-hypoxia">3%</strong><small id="metric-sim-agents">130 simulation agents</small></div>
+            <div><span>Core O₂</span><strong id="metric-core-oxygen">96%</strong></div>
+          </div>
+          <div class="hero-model-context" aria-label="Virtual experiment model context">
+            <span id="hero-initial-population">~130 estimated biological cells at D0</span>
+            <span id="hero-rendered-glyphs">130 representative glyphs currently shown</span>
+            <span id="hero-simulation-agents">~130 coarse-grained simulation agents</span>
+            <span id="hero-timestep">Reduced-model step: 0.1 day; 7-day timeline</span>
+          </div>
+        </div>
+        <p class="causal-strip" id="causal-strip" aria-live="polite">O₂ stable → hypoxia low → cycling active → growth begins</p>
+      </section>
+
+      <section class="microenvironment-section" aria-labelledby="microenvironment-title">
+        <div class="section-heading section-heading-small">
+          <div>
+            <p class="eyebrow">02 — Transport physics</p>
+            <h2 id="microenvironment-title">Transport regime and radial fields.</h2>
+          </div>
+          <p class="section-description">Transport conditions, field profiles, and organoid-level readouts.</p>
+        </div>
+        <div class="spatial-layout">
+          <div class="cross-section-panel">
+            <div class="cross-section-meta">
+              <span>Radial transport profile (bulk → depletion layer → tissue)</span>
+              <span id="transport-day">DAY 0.0</span>
+            </div>
+            <svg id="transport-profile" viewBox="0 0 760 300" role="img" aria-label="Radial O2 and glucose profile from bulk medium to organoid core">
+              <g class="chart-grid" aria-hidden="true">
+                <line x1="62" y1="255" x2="738" y2="255"></line>
+                <line x1="62" y1="22" x2="62" y2="255"></line>
+                <line x1="62" y1="197" x2="738" y2="197"></line>
+                <line x1="62" y1="140" x2="738" y2="140"></line>
+                <line x1="62" y1="82" x2="738" y2="82"></line>
+                <line x1="62" y1="22" x2="738" y2="22"></line>
+              </g>
+              <line id="profile-midline" class="chart-marker-line" x1="430" y1="20" x2="430" y2="258"></line>
+              <line id="profile-shell-end" class="chart-marker-line" x1="602" y1="20" x2="602" y2="258"></line>
+              <path id="profile-oxygen" class="profile-line oxygen" d=""></path>
+              <path id="profile-glucose" class="profile-line glucose" d=""></path>
+              <circle id="core-indicator" cx="706" cy="48" r="10"></circle>
+              <text x="62" y="279" class="cross-section-label">Bulk medium</text>
+              <text x="370" y="279" class="cross-section-label">Depletion layer</text>
+              <text x="618" y="279" class="cross-section-label">Tissue interior</text>
+              <text id="profile-o2-depletion" x="62" y="40" class="cross-section-label">ΔO₂ bulk→surface</text>
+              <text id="profile-regime" x="62" y="58" class="cross-section-label">δ/R · ΦO₂</text>
+            </svg>
+            <p class="figure-footnote" id="profile-lumen-note">Transport profile annotation.</p>
+          </div>
+          <div class="spatial-controls">
+            <p class="eyebrow">Transport regime</p>
+            <div class="spatial-readouts">
+              <div><span>Boundary layer</span><strong id="spatial-boundary">240 µm</strong></div>
+              <div><span>Organoid radius</span><strong id="spatial-radius">120 µm</strong></div>
+              <div><span>Transport barrier δ/R</span><strong id="spatial-delta-r">2.00</strong></div>
+              <div><span>O₂ penetration length</span><strong id="spatial-penetration">140 µm</strong></div>
+              <div><span>Bulk O₂</span><strong id="spatial-bulk-o2">100%</strong></div>
+              <div><span>Surface O₂</span><strong id="spatial-surface-o2">93%</strong></div>
+              <div><span>Core O₂</span><strong id="spatial-core-o2">96%</strong></div>
+              <div><span>Core glucose</span><strong id="spatial-core-glucose">97%</strong></div>
+              <div><span>Hypoxic fraction</span><strong id="spatial-hypoxia">3%</strong></div>
+              <div><span>Residual g</span><strong id="spatial-residual-g">1e-4 g</strong></div>
+              <div><span>Shear</span><strong id="spatial-shear">0.0 mPa</strong></div>
+              <div><span>Sedimentation</span><strong id="spatial-sedimentation">No</strong></div>
+              <div><span>Mixing index</span><strong id="spatial-mixing">8%</strong></div>
+              <div><span>Corrected full-run grid</span><strong id="spatial-voxel">48³ · 20 µm voxel</strong></div>
+            </div>
+            <p class="transport-note" id="transport-regime-note">Transport regime note.</p>
+            <p class="transport-note" id="hero-field-note">Layer controls in section 01 update this profile context.</p>
+          </div>
+        </div>
+        <details class="figure-info">
+          <summary>Field method &amp; provenance</summary>
+          <div class="model-info-grid" id="transport-model-info"></div>
+        </details>
+      </section>
+
+      <section class="trajectory-section" aria-labelledby="growth-title">
+        <div class="section-heading section-heading-small">
+          <div>
+            <p class="eyebrow">03 — Population dynamics</p>
+            <h2 id="growth-title">GROWTH ACROSS GRAVITY CONDITIONS</h2>
+          </div>
+          <p class="section-description" id="growth-subtitle">CRC tumour organoid · Cyst</p>
+        </div>
+        <p class="figure-label">GROWTH FROM DAY 0 · reduced-order browser trajectories</p>
+        <div class="trajectory-grid">
+          <figure class="growth-figure">
+            <div class="chart-y-label">Growth from Day 0</div>
+            <div class="growth-chart-wrap">
+              <svg id="growth-chart" viewBox="0 0 760 300" role="img" aria-label="Growth from Day 0 across five gravity conditions">
+                <g class="chart-grid" aria-hidden="true"></g>
+                <g class="gravity-trajectories" aria-hidden="true"></g>
+                <line class="chart-marker-line" aria-hidden="true"></line>
+                <g class="chart-labels" aria-hidden="true"></g>
+              </svg>
+            </div>
+            <div class="gravity-legend" id="gravity-legend"></div>
+            <p class="figure-footnote growth-note">Growth is normalized to the Day-0 population index; estimated absolute biological cell count is reported above.</p>
+          </figure>
+          <div class="cell-state-panel">
+            <div class="cell-state-heading"><div><p class="eyebrow">Current day <span id="cell-state-day">0.0</span></p><h3>Cellular state</h3></div></div>
+            <div class="stacked-bar" id="stacked-bar" role="img" aria-label="Cell-state composition">
+              <span class="bar-segment proliferating" data-state="proliferating"></span>
+              <span class="bar-segment quiescent" data-state="quiescent"></span>
+              <span class="bar-segment apoptotic" data-state="apoptotic"></span>
+              <span class="bar-segment necrotic" data-state="necrotic"></span>
+            </div>
+            <div class="state-legend">
+              <div class="state-row" data-state-row="proliferating"><span class="state-swatch proliferating"></span><span>Proliferating</span><strong>0%</strong></div>
+              <div class="state-row" data-state-row="quiescent"><span class="state-swatch quiescent"></span><span>Quiescent</span><strong>0%</strong></div>
+              <div class="state-row" data-state-row="apoptotic"><span class="state-swatch apoptotic"></span><span>Apoptotic</span><strong>0%</strong></div>
+              <div class="state-row" data-state-row="necrotic"><span class="state-swatch necrotic"></span><span>Necrotic</span><strong>0%</strong></div>
+            </div>
+            <details class="figure-info">
+              <summary>Cell-state method &amp; thresholds</summary>
+              <div class="model-info-grid" id="cell-state-info"></div>
+            </details>
+          </div>
+        </div>
+        <details class="figure-info">
+          <summary>Growth source &amp; experiment context</summary>
+          <div class="model-info-grid" id="growth-model-info"></div>
+        </details>
+        <div class="gravity-effect-note" id="gravity-effect-note">Gravity effect is computed against the matched Ground 1g trajectory.</div>
+      </section>
+
+      <section class="sensitivity-section" aria-labelledby="sensitivity-title">
+        <div class="section-heading section-heading-small">
+          <div>
+            <p class="eyebrow">04 — Sensitivity</p>
+            <h2 id="sensitivity-title">WHAT DRIVES THIS RESULT?</h2>
+          </div>
+          <p class="section-description">Day-7 local response to a ±50% parameter perturbation.</p>
+        </div>
+        <div class="sensitivity-figure">
+          <div class="sensitivity-legend"><span><i class="low-swatch"></i>−50%</span><span><i class="high-swatch"></i>+50%</span><span class="sensitivity-source">Illustrative model sensitivity</span></div>
+          <div class="tornado-chart" id="tornado-chart" role="img" aria-label="Illustrative local sensitivity analysis"></div>
+          <p class="figure-footnote">Bars show Day-7 log viable-cell-volume proxy changes relative to the current scenario; the reduced model uses a fixed per-cell volume, and drug EC50 is omitted because this experiment has no drug input.</p>
+        </div>
+        <details class="figure-info">
+          <summary>Sensitivity method &amp; scope</summary>
+          <div class="model-info-grid" id="sensitivity-model-info"></div>
+        </details>
+      </section>
+
+      <section class="omics-section" aria-labelledby="omics-title">
+        <div class="section-heading section-heading-small">
+          <div>
+            <p class="eyebrow">05 — Molecular evidence</p>
+            <h2 id="omics-title">Multi-omics gravity contrast</h2>
+          </div>
+          <p class="section-description" id="omics-subtitle">Programme scores are condition-level evidence, not a D0–D7 time series.</p>
+        </div>
+        <div class="omics-figure">
+          <div class="omics-chart-topline">
+            <span id="omics-source">Illustrative programme index</span>
+            <span>Contrast relative to matched Ground 1g</span>
+          </div>
+          <svg id="omics-chart" viewBox="0 0 760 370" role="img" aria-label="Multi-omics programme contrast relative to matched ground 1g">
+            <g class="omics-grid" aria-hidden="true"></g>
+            <g class="omics-bars"></g>
+            <g class="omics-labels" aria-hidden="true"></g>
+          </svg>
+          <p class="figure-footnote" id="omics-footnote">Illustrative scores have no error bars. Repository contrasts retain their reported SD; no longitudinal omics data are implied.</p>
+        </div>
+        <details class="figure-info">
+          <summary>Dataset &amp; calibration provenance</summary>
+          <div class="model-info-grid" id="omics-model-info"></div>
+        </details>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>ORBIO <span aria-hidden="true">·</span> Virtual organoid</span>
+      <span>Illustrative trajectory engine · ORBIO virtual organoid</span>
+    </footer>
+  </body>
+</html>

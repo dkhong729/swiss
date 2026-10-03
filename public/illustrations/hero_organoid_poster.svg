@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900" role="img" aria-labelledby="title desc">
+  <title id="title">Hero organoid poster placeholder</title>
+  <desc id="desc">A clean scientific organoid growth composition from day 1 to day 7.</desc>
+  <rect width="1400" height="900" fill="#f7f4ee"/>
+  <circle cx="705" cy="452" r="310" fill="#80d4d0" opacity=".12"/>
+  <circle cx="705" cy="452" r="235" fill="#0f79c8" opacity=".12"/>
+  <g fill="none" stroke="#d59a31" stroke-width="18" opacity=".18">
+    <ellipse cx="705" cy="452" rx="390" ry="270"/>
+    <ellipse cx="705" cy="452" rx="500" ry="340"/>
+  </g>
+  <g stroke="#102235" stroke-width="2" opacity=".7">
+    <circle cx="492" cy="392" r="24" fill="#0f79c8"/>
+    <circle cx="558" cy="458" r="30" fill="#19a28b"/>
+    <circle cx="648" cy="354" r="28" fill="#0f79c8"/>
+    <circle cx="716" cy="472" r="34" fill="#19a28b"/>
+    <circle cx="816" cy="384" r="26" fill="#0f79c8"/>
+    <circle cx="914" cy="490" r="31" fill="#d36d5d"/>
+    <circle cx="788" cy="586" r="24" fill="#7b6b62"/>
+    <circle cx="592" cy="594" r="23" fill="#19a28b"/>
+    <circle cx="936" cy="334" r="20" fill="#0f79c8"/>
+  </g>
+  <text x="82" y="108" fill="#102235" font-family="Inter,Arial,sans-serif" font-size="44" font-weight="700">ORBIO organoid growth placeholder</text>
+  <text x="82" y="162" fill="#5f6c77" font-family="Inter,Arial,sans-serif" font-size="26">Replace with generated WebP after final art direction.</text>
+</svg>

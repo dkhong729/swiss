@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900" role="img" aria-labelledby="title desc">
+  <title id="title">Flight selection funnel placeholder</title>
+  <desc id="desc">Many virtual scenarios funneling toward a small set of flight candidates.</desc>
+  <rect width="1400" height="900" fill="#f7f4ee"/>
+  <g opacity=".72">
+    <circle cx="166" cy="170" r="7" fill="#0f79c8"/><circle cx="244" cy="218" r="7" fill="#19a28b"/>
+    <circle cx="360" cy="148" r="7" fill="#d59a31"/><circle cx="520" cy="240" r="7" fill="#0f79c8"/>
+    <circle cx="760" cy="180" r="7" fill="#19a28b"/><circle cx="920" cy="260" r="7" fill="#0f79c8"/>
+    <circle cx="1110" cy="190" r="7" fill="#d59a31"/><circle cx="1210" cy="320" r="7" fill="#0f79c8"/>
+    <circle cx="300" cy="360" r="7" fill="#0f79c8"/><circle cx="620" cy="350" r="7" fill="#19a28b"/>
+    <circle cx="820" cy="392" r="7" fill="#d59a31"/><circle cx="1030" cy="420" r="7" fill="#0f79c8"/>
+  </g>
+  <path d="M250 270 H1150 L815 704 H585 Z" fill="#80d4d0" opacity=".14" stroke="#102235" stroke-width="3"/>
+  <rect x="544" y="722" width="312" height="82" fill="#fbfaf6" stroke="#102235" stroke-width="3"/>
+  <text x="584" y="774" fill="#102235" font-family="Inter,Arial" font-size="30" font-weight="700">flight opportunity</text>
+  <text x="130" y="110" fill="#102235" font-family="Inter,Arial" font-size="44" font-weight="700">Flight selection funnel placeholder</text>
+</svg>

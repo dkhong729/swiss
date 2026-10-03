@@ -1,0 +1,70 @@
+{
+  "available": true,
+  "source": "outputs/pipeline_corrected_v2/summary.json",
+  "profile": {
+    "name": "rtx5070ti",
+    "grid_n": 48,
+    "grid_h": 20.0,
+    "max_agents": 5000,
+    "pair_chunk": 4096,
+    "n_scenarios": 480,
+    "workers": 4,
+    "cells_per_graph": 768,
+    "encoder_epochs": 60,
+    "head_epochs": 400,
+    "ensemble": 8,
+    "graph_batch": 32,
+    "al_baselines": 24,
+    "al_rounds": 5,
+    "al_batch": 8,
+    "sensitivity": true,
+    "amp": true
+  },
+  "gpu": {
+    "name": "NVIDIA GeForce RTX 5070 Ti",
+    "vramGb": 15.9,
+    "torch": "2.11.0+cu128",
+    "cudaBuild": "12.8",
+    "computeCapability": "12.0",
+    "architecture": [
+      "sm_75",
+      "sm_80",
+      "sm_86",
+      "sm_90",
+      "sm_100",
+      "sm_120"
+    ],
+    "bf16": true
+  },
+  "quality": {
+    "attempted": 480,
+    "capped": 127,
+    "retained": 353,
+    "policy": "exclude",
+    "scopeNote": "Metrics describe the uncensored subset; cap exclusions may change the scenario distribution."
+  },
+  "physics": {
+    "jacobiIterations": 40,
+    "d_o2": 7200000.0,
+    "d_glc": 2000000.0,
+    "o2Hypoxic": 0.25,
+    "o2ProliferationSaturation": 0.6,
+    "o2Necrotic": 0.08,
+    "glucoseMinimum": 0.15,
+    "cycleHours": 22.0,
+    "simulationStepHours": 1.0
+  },
+  "initialization": {
+    "datasetMinimumAgents": 100,
+    "datasetMaximumAgents": 160,
+    "scenarioDefaultAgents": 120,
+    "source": "orbio/data.py dataset generator and orbio/config.py Scenario.n0"
+  },
+  "architecture": {
+    "encoder": "GNN / kNN EdgeConv",
+    "inputFeatures": 12,
+    "nearestNeighbours": 10,
+    "embeddingDimensions": 64,
+    "pretraining": "Contrastive NT-Xent"
+  }
+}

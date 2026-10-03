@@ -1,0 +1,17 @@
+tissue,program,delta,sd,n_pairs,n_ug,n_ref,design,group_col,layer
+neural,adhesion,-0.145598294635578,0.15234786123148944,4,4,4,paired biological units,donor_id,combined
+neural,anti_apoptosis,-0.14685278902188947,0.09764647799993573,4,4,4,paired biological units,donor_id,combined
+neural,apoptosis,-0.18930920461228212,0.11009302681541407,4,4,4,paired biological units,donor_id,combined
+neural,apoptosis_balance,-0.042456415590392704,0.17684958640416484,4,4,4,paired biological units,donor_id,combined
+neural,glycolysis,0.6731107863264882,0.218215179420178,4,4,4,paired biological units,donor_id,combined
+neural,hypoxia,0.23250503822302152,0.13559175500040022,4,4,4,paired biological units,donor_id,combined
+neural,oxphos,-0.25167233608176004,0.10157396161507914,4,4,4,paired biological units,donor_id,combined
+neural,proliferation,-0.6224229766682631,0.19770867145278573,4,4,4,paired biological units,donor_id,combined
+neural,adhesion,-0.145598294635578,0.15234786123148944,4,4,4,paired biological units,donor_id,transcriptome
+neural,anti_apoptosis,-0.14685278902188947,0.09764647799993573,4,4,4,paired biological units,donor_id,transcriptome
+neural,apoptosis,-0.18930920461228212,0.11009302681541407,4,4,4,paired biological units,donor_id,transcriptome
+neural,apoptosis_balance,-0.042456415590392704,0.17684958640416484,4,4,4,paired biological units,donor_id,transcriptome
+neural,glycolysis,0.6731107863264882,0.218215179420178,4,4,4,paired biological units,donor_id,transcriptome
+neural,hypoxia,0.23250503822302152,0.13559175500040022,4,4,4,paired biological units,donor_id,transcriptome
+neural,oxphos,-0.25167233608176004,0.10157396161507914,4,4,4,paired biological units,donor_id,transcriptome
+neural,proliferation,-0.6224229766682631,0.19770867145278573,4,4,4,paired biological units,donor_id,transcriptome

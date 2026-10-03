@@ -1,0 +1,853 @@
+{
+  "generated_at": "2026-10-03T09:34:20.316193+00:00",
+  "primary_run": {
+    "name": "pipeline_corrected_v2",
+    "path": "outputs/pipeline_corrected_v2",
+    "started": "2026-10-03 04:38:24",
+    "finished": "2026-10-03 05:06:18",
+    "profile": {
+      "name": "rtx5070ti",
+      "grid_n": 48,
+      "grid_h": 20.0,
+      "max_agents": 5000,
+      "pair_chunk": 4096,
+      "n_scenarios": 480,
+      "workers": 4,
+      "cells_per_graph": 768,
+      "encoder_epochs": 60,
+      "head_epochs": 400,
+      "ensemble": 8,
+      "graph_batch": 32,
+      "al_baselines": 24,
+      "al_rounds": 5,
+      "al_batch": 8,
+      "sensitivity": true,
+      "amp": true
+    },
+    "validation_scope": "synthetic simulator outcomes; no experimental validation",
+    "cap_policy": "exclude",
+    "total_scenarios": 480,
+    "capped_scenarios": 127,
+    "retained_uncensored": 353
+  },
+  "figures": {
+    "cross_sections": {
+      "src": "/public/figures/pipeline_corrected_v2/fig1_cross_sections.svg",
+      "source": "outputs/pipeline_corrected_v2/fig1_cross_sections.svg",
+      "run": "pipeline_corrected_v2",
+      "version_note": "Primary corrected run; do not silently mix with older pipeline runs."
+    },
+    "growth_curves": {
+      "src": "/public/figures/pipeline_corrected_v2/fig2_growth_curves.svg",
+      "source": "outputs/pipeline_corrected_v2/fig2_growth_curves.svg",
+      "run": "pipeline_corrected_v2",
+      "version_note": "Primary corrected run; do not silently mix with older pipeline runs."
+    },
+    "classifier": {
+      "src": "/public/figures/pipeline_corrected_v2/fig3_classifier.svg",
+      "source": "outputs/pipeline_corrected_v2/fig3_classifier.svg",
+      "run": "pipeline_corrected_v2",
+      "version_note": "Primary corrected run; do not silently mix with older pipeline runs."
+    },
+    "active_learning": {
+      "src": "/public/figures/pipeline_corrected_v2/fig4_active_learning.svg",
+      "source": "outputs/pipeline_corrected_v2/fig4_active_learning.svg",
+      "run": "pipeline_corrected_v2",
+      "version_note": "Primary corrected run; do not silently mix with older pipeline runs."
+    },
+    "sensitivity": {
+      "src": "/public/figures/pipeline_corrected_v2/fig5_sensitivity.svg",
+      "source": "outputs/pipeline_corrected_v2/fig5_sensitivity.svg",
+      "run": "pipeline_corrected_v2",
+      "version_note": "Primary corrected run; do not silently mix with older pipeline runs."
+    },
+    "twin": {
+      "src": "/public/figures/pipeline_corrected_v2/fig6_twin.svg",
+      "source": "outputs/pipeline_corrected_v2/fig6_twin.svg",
+      "run": "pipeline_corrected_v2",
+      "version_note": "Primary corrected run; do not silently mix with older pipeline runs."
+    },
+    "importance": {
+      "src": "/public/figures/pipeline_corrected_v2/fig7_importance.svg",
+      "source": "outputs/pipeline_corrected_v2/fig7_importance.svg",
+      "run": "pipeline_corrected_v2",
+      "version_note": "Primary corrected run; do not silently mix with older pipeline runs."
+    },
+    "growth_laws": {
+      "src": "/public/figures/pipeline_corrected_v2/fig8_growth_laws.svg",
+      "source": "outputs/pipeline_corrected_v2/fig8_growth_laws.svg",
+      "run": "pipeline_corrected_v2",
+      "version_note": "Primary corrected run; do not silently mix with older pipeline runs."
+    },
+    "medium_monitor": {
+      "src": "/public/figures/supporting/fig_medium_monitor.svg",
+      "source": "outputs/medium/fig_medium_monitor.svg",
+      "run": "outputs/medium",
+      "version_note": "Supporting run shown separately from pipeline_corrected_v2."
+    },
+    "omics_flight_contrast": {
+      "src": "/public/figures/supporting/fig_omics_contrast.svg",
+      "source": "outputs/omics/flight_v2/fig_omics_contrast.svg",
+      "run": "outputs/omics/flight_v2",
+      "version_note": "Supporting run shown separately from pipeline_corrected_v2."
+    },
+    "omics_flight_factors": {
+      "src": "/public/figures/supporting/fig_omics_factors.svg",
+      "source": "outputs/omics/flight_v2/fig_omics_factors.svg",
+      "run": "outputs/omics/flight_v2",
+      "version_note": "Supporting run shown separately from pipeline_corrected_v2."
+    },
+    "omics_crc_contrast": {
+      "src": "/public/figures/supporting/omics_crc_contrast_fig_omics_contrast.svg",
+      "source": "outputs/omics/crc/fig_omics_contrast.svg",
+      "run": "outputs/omics/crc",
+      "version_note": "Supporting run shown separately from pipeline_corrected_v2."
+    }
+  },
+  "class_balance": {
+    "regresses": 64,
+    "arrested": 10,
+    "grows": 279
+  },
+  "metrics": {
+    "random_split": {
+      "n": 71,
+      "accuracy": 0.8873239436619719,
+      "accuracy_pct": 88.7,
+      "balanced_accuracy": 0.5915750915750916,
+      "balanced_accuracy_pct": 59.2,
+      "macro_f1": 0.5811287477954145,
+      "ece": 0.08956501013796096,
+      "macro_auc_ovr": 0.7867613812141548,
+      "per_class_support": [
+        13,
+        2,
+        56
+      ],
+      "per_class_recall": [
+        0.8461538461538461,
+        0.0,
+        0.9285714285714286
+      ],
+      "confusion": [
+        [
+          11,
+          0,
+          2
+        ],
+        [
+          0,
+          0,
+          2
+        ],
+        [
+          3,
+          1,
+          52
+        ]
+      ]
+    },
+    "random_split_scope": "Synthetic interpolation inside the corrected simulator dataset.",
+    "heldout_drug": {
+      "heldout_value": "DrugD_cytotoxic_lowpen",
+      "scope": "held-out simulator condition, not measured flight outcomes",
+      "growth_class": {
+        "n": 77,
+        "accuracy": 0.6493506493506493,
+        "accuracy_pct": 64.9,
+        "balanced_accuracy": 0.45611111111111113,
+        "balanced_accuracy_pct": 45.6,
+        "macro_f1": 0.4306471306471306,
+        "ece": 0.20355754858487612,
+        "macro_auc_ovr": 0.7037820210147254,
+        "per_class_support": [
+          24,
+          3,
+          50
+        ],
+        "per_class_recall": [
+          0.7083333333333334,
+          0.0,
+          0.66
+        ],
+        "confusion": [
+          [
+            17,
+            0,
+            7
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            17,
+            0,
+            33
+          ]
+        ]
+      },
+      "log_fold": {
+        "mse": 8.709113818622468,
+        "pearson_r": 0.39750694975004697
+      }
+    },
+    "heldout_gravity": {
+      "heldout_value": "flight_ug",
+      "scope": "held-out simulator condition, not measured flight outcomes",
+      "growth_class": {
+        "n": 84,
+        "accuracy": 0.7380952380952381,
+        "accuracy_pct": 73.8,
+        "balanced_accuracy": 0.30392156862745096,
+        "balanced_accuracy_pct": 30.4,
+        "macro_f1": 0.28703703703703703,
+        "ece": 0.10277411341667175,
+        "macro_auc_ovr": 0.6825988630566598,
+        "per_class_support": [
+          15,
+          1,
+          68
+        ],
+        "per_class_recall": [
+          0.0,
+          0.0,
+          0.9117647058823529
+        ],
+        "confusion": [
+          [
+            0,
+            2,
+            13
+          ],
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            6,
+            62
+          ]
+        ]
+      },
+      "log_fold": {
+        "mse": 2.4315904633457173,
+        "pearson_r": 0.6432594473476392
+      },
+      "ood_flag_rate": 0.05952380952380952
+    },
+    "fate_composition": {
+      "mae_fraction": 0.058223240077495575,
+      "per_state_pearson": [
+        0.7013308485707597,
+        0.7376141869617105,
+        0.38378153022832995,
+        0.003983098670737923
+      ]
+    },
+    "permutation_importance": {
+      "baseline UR (GNN)": [
+        0.028169014084507095,
+        0.026723473184521514
+      ],
+      "baseline readouts": [
+        0.0422535211267606,
+        0.033330026947040084
+      ],
+      "gravity": [
+        0.008450704225352167,
+        0.014363435249557169
+      ],
+      "drug": [
+        0.11830985915492964,
+        0.019105154882042983
+      ],
+      "dose/schedule/morphology": [
+        0.20000000000000004,
+        0.02069991331929447
+      ],
+      "tissue": [
+        -0.005633802816901378,
+        0.014363435249557152
+      ],
+      "flight hardware": [
+        0.0,
+        0.0
+      ]
+    },
+    "active_learning": {
+      "curves": {
+        "mutual_info": [
+          {
+            "n_labeled": 32,
+            "accuracy": 0.7464788732394366,
+            "macro_f1": 0.4444444444444445,
+            "balanced_accuracy": 0.472985347985348,
+            "excluded_capped": 0,
+            "mean_mutual_info_test": 0.18421411514282227
+          },
+          {
+            "n_labeled": 35,
+            "accuracy": 0.7323943661971831,
+            "macro_f1": 0.4142073107590349,
+            "balanced_accuracy": 0.42765567765567764,
+            "excluded_capped": 5,
+            "mean_mutual_info_test": 0.2316596657037735
+          },
+          {
+            "n_labeled": 43,
+            "accuracy": 0.7464788732394366,
+            "macro_f1": 0.4674922600619195,
+            "balanced_accuracy": 0.532051282051282,
+            "excluded_capped": 5,
+            "mean_mutual_info_test": 0.2724769115447998
+          },
+          {
+            "n_labeled": 51,
+            "accuracy": 0.7464788732394366,
+            "macro_f1": 0.4776612276612277,
+            "balanced_accuracy": 0.5123626373626374,
+            "excluded_capped": 5,
+            "mean_mutual_info_test": 0.22854076325893402
+          },
+          {
+            "n_labeled": 57,
+            "accuracy": 0.8309859154929577,
+            "macro_f1": 0.5212876427829699,
+            "balanced_accuracy": 0.5677655677655677,
+            "excluded_capped": 7,
+            "mean_mutual_info_test": 0.19667233526706696
+          },
+          {
+            "n_labeled": 63,
+            "accuracy": 0.8169014084507042,
+            "macro_f1": 0.5112837587865334,
+            "balanced_accuracy": 0.5618131868131868,
+            "excluded_capped": 9,
+            "mean_mutual_info_test": 0.15288205444812775
+          }
+        ],
+        "random": [
+          {
+            "n_labeled": 32,
+            "accuracy": 0.7464788732394366,
+            "macro_f1": 0.4444444444444445,
+            "balanced_accuracy": 0.472985347985348,
+            "excluded_capped": 0,
+            "mean_mutual_info_test": 0.18421411514282227
+          },
+          {
+            "n_labeled": 38,
+            "accuracy": 0.7183098591549296,
+            "macro_f1": 0.383952802359882,
+            "balanced_accuracy": 0.3823260073260073,
+            "excluded_capped": 2,
+            "mean_mutual_info_test": 0.25804078578948975
+          },
+          {
+            "n_labeled": 46,
+            "accuracy": 0.7746478873239436,
+            "macro_f1": 0.46262626262626255,
+            "balanced_accuracy": 0.48489010989010994,
+            "excluded_capped": 2,
+            "mean_mutual_info_test": 0.2142419070005417
+          },
+          {
+            "n_labeled": 52,
+            "accuracy": 0.7464788732394366,
+            "macro_f1": 0.432996632996633,
+            "balanced_accuracy": 0.4336080586080586,
+            "excluded_capped": 4,
+            "mean_mutual_info_test": 0.17267493903636932
+          },
+          {
+            "n_labeled": 59,
+            "accuracy": 0.8169014084507042,
+            "macro_f1": 0.5079365079365079,
+            "balanced_accuracy": 0.5618131868131868,
+            "excluded_capped": 5,
+            "mean_mutual_info_test": 0.17284677922725677
+          },
+          {
+            "n_labeled": 65,
+            "accuracy": 0.7605633802816901,
+            "macro_f1": 0.4833373291776552,
+            "balanced_accuracy": 0.5773809523809524,
+            "excluded_capped": 7,
+            "mean_mutual_info_test": 0.1981206238269806
+          }
+        ]
+      },
+      "experiments_simulated": 59,
+      "scope": "single-seed exploratory comparison; use run_validation.py for repeats"
+    },
+    "twin": {
+      "id": "VO-100090",
+      "version": 5,
+      "log_valid": true,
+      "condition": {
+        "gravity": "flight_ug",
+        "drug": "DrugD_cytotoxic_lowpen",
+        "dose": 0.5197388230121472,
+        "schedule": "continuous",
+        "morphology": "solid",
+        "tissue": "cardiac",
+        "hardware": "flight_cubelab_72h",
+        "days": 7,
+        "treat_start_h": 24,
+        "n0": 143,
+        "prolif_mult": 0.7940503594010948,
+        "o2_uptake_mult": 1.0535295732952126,
+        "ec50_mult": 1.001181556628508,
+        "seed": 100090
+      },
+      "ai_pred_class": "regresses",
+      "true_class": "grows",
+      "final_forecast_day6_p5_p50_p95": [
+        1.6455639513214078,
+        1.7948114042695593,
+        1.9567526742521244
+      ],
+      "true_day6": 1.9829932668073125
+    },
+    "growth_laws": {
+      "best_model_counts": {
+        "ground_1g": {
+          "bertalanffy+tau": 9,
+          "gompertz+tau": 4,
+          "logistic": 2,
+          "bertalanffy": 1
+        },
+        "flight_ug": {
+          "bertalanffy+tau": 5,
+          "logistic": 4,
+          "gompertz": 3,
+          "gompertz+tau": 5
+        },
+        "sim_ug_rpm": {
+          "logistic": 5,
+          "bertalanffy+tau": 2,
+          "exponential": 2,
+          "bertalanffy": 1
+        },
+        "flight_1g_ctrl": {
+          "exponential": 1,
+          "bertalanffy": 8,
+          "gompertz+tau": 1,
+          "gompertz": 3,
+          "logistic": 1
+        },
+        "sim_ug_clinostat": {
+          "gompertz+tau": 1,
+          "logistic": 2,
+          "bertalanffy+tau": 4,
+          "exponential": 1,
+          "gompertz": 1
+        }
+      }
+    },
+    "sensitivity": {
+      "ground_1g": {
+        "baseline": -2.849882334749297,
+        "noise_sd": 0.48080943216836936,
+        "params": {
+          "cycle_h (doubling time)": [
+            1.6858640358934198,
+            -4.209655380235707
+          ],
+          "k_o2 (O2 uptake)": [
+            -2.245426713015699,
+            -2.245426713015699
+          ],
+          "D_o2 (O2 diffusivity)": [
+            -2.245426713015699,
+            -2.245426713015699
+          ],
+          "boundary layer (gravity-specific)": [
+            -2.833213377917818,
+            -2.173967699408793
+          ],
+          "o2_hypoxic threshold": [
+            -2.245426713015699,
+            -2.245426713015699
+          ],
+          "tissue \u00b5g proliferation mult.": [
+            -2.245426713015699,
+            -2.245426713015699
+          ],
+          "medium O2 draw (hardware)": [
+            -2.245426713015699,
+            -2.245426713015699
+          ],
+          "drug EC50": [
+            -3.9318255946300247,
+            -0.9665525708441075
+          ]
+        }
+      },
+      "flight_ug": {
+        "baseline": -2.659631717641506,
+        "noise_sd": 0.2706849777390475,
+        "params": {
+          "cycle_h (doubling time)": [
+            1.1218068481421324,
+            -3.1306515594341495
+          ],
+          "k_o2 (O2 uptake)": [
+            -2.3328904300974282,
+            -2.3328904300974282
+          ],
+          "D_o2 (O2 diffusivity)": [
+            -2.3328904300974282,
+            -2.3328904300974282
+          ],
+          "boundary layer (gravity-specific)": [
+            -2.7577735947593864,
+            -2.064626414199441
+          ],
+          "o2_hypoxic threshold": [
+            -2.3328904300974282,
+            -2.3328904300974282
+          ],
+          "tissue \u00b5g proliferation mult.": [
+            -6.907755278982137,
+            -0.15333410215602622
+          ],
+          "medium O2 draw (hardware)": [
+            -2.3328904300974282,
+            -2.3328904300974282
+          ],
+          "drug EC50": [
+            -3.79922755424155,
+            -1.3714792336394956
+          ]
+        }
+      }
+    }
+  },
+  "supporting_runs": {
+    "growth_law_fits_file_present": true,
+    "twin_audit_events": null,
+    "medium": {
+      "source": "outputs/medium",
+      "summary": {
+        "nominal": {
+          "alerts": [],
+          "median_lactate_fraction": 0.5059714092330974
+        },
+        "exchange failure": {
+          "alerts": [
+            {
+              "t_h": 144.0,
+              "type": "MISSED_EXCHANGE",
+              "detail": "glucose 9.5 mM; expected 16.8 if exchanged, 10.2 if not",
+              "series": "exchange failure"
+            },
+            {
+              "t_h": 168.0,
+              "type": "GLUCOSE_DEPLETION_FORECAST",
+              "detail": "< 2.0 mM in ~29 h, before next exchange",
+              "series": "exchange failure"
+            },
+            {
+              "t_h": 192.0,
+              "type": "HYPOXIA",
+              "detail": "lactate fraction ~0.75 (lower bound 0.72; normoxic baseline ~0.50, excess +0.22)",
+              "series": "exchange failure"
+            },
+            {
+              "t_h": 216.0,
+              "type": "MISSED_EXCHANGE",
+              "detail": "glucose 0.0 mM; expected 15.8 if exchanged, 0.0 if not",
+              "series": "exchange failure"
+            }
+          ],
+          "median_lactate_fraction": 0.7360549010972213
+        },
+        "detection_stats_200_runs": [
+          {
+            "scenario": "nominal",
+            "alert": "MISSED_EXCHANGE",
+            "pct_runs": 3.5,
+            "mean_first_day": 3.0
+          },
+          {
+            "scenario": "nominal",
+            "alert": "GLUCOSE_DEPLETION_FORECAST",
+            "pct_runs": 20.0,
+            "mean_first_day": 9.775
+          },
+          {
+            "scenario": "nominal",
+            "alert": "HYPOXIA",
+            "pct_runs": 4.0,
+            "mean_first_day": 5.75
+          },
+          {
+            "scenario": "exchange failure",
+            "alert": "MISSED_EXCHANGE",
+            "pct_runs": 100.0,
+            "mean_first_day": 5.895
+          },
+          {
+            "scenario": "exchange failure",
+            "alert": "GLUCOSE_DEPLETION_FORECAST",
+            "pct_runs": 100.0,
+            "mean_first_day": 7.0
+          },
+          {
+            "scenario": "exchange failure",
+            "alert": "HYPOXIA",
+            "pct_runs": 35.5,
+            "mean_first_day": 7.746478873239436
+          }
+        ],
+        "params": {
+          "volume_ml": 2.0,
+          "glucose0_mM": 17.5,
+          "exchange_every_h": 72.0,
+          "exchange_frac": 0.9,
+          "n_cells0": 400000.0,
+          "growth_per_h": 0.02,
+          "capacity_cells": 3000000.0,
+          "glc_uptake_pmol_cell_h": 0.12,
+          "glycolytic_base": 0.5,
+          "pasteur_gain": 1.0,
+          "o2_gas_per_h": 0.004,
+          "o2_use_per_cell_h": 1e-08,
+          "o2_sat": 0.5,
+          "o2_hyp": 0.1,
+          "glc_starve_mM": 1.0
+        }
+      },
+      "monitor_detection_rows": [
+        {
+          "scenario": "nominal",
+          "alert": "MISSED_EXCHANGE",
+          "pct_runs": "3.5",
+          "mean_first_day": "3.0"
+        },
+        {
+          "scenario": "nominal",
+          "alert": "GLUCOSE_DEPLETION_FORECAST",
+          "pct_runs": "20.0",
+          "mean_first_day": "9.775"
+        },
+        {
+          "scenario": "nominal",
+          "alert": "HYPOXIA",
+          "pct_runs": "4.0",
+          "mean_first_day": "5.75"
+        },
+        {
+          "scenario": "exchange failure",
+          "alert": "MISSED_EXCHANGE",
+          "pct_runs": "100.0",
+          "mean_first_day": "5.895"
+        },
+        {
+          "scenario": "exchange failure",
+          "alert": "GLUCOSE_DEPLETION_FORECAST",
+          "pct_runs": "100.0",
+          "mean_first_day": "7.0"
+        },
+        {
+          "scenario": "exchange failure",
+          "alert": "HYPOXIA",
+          "pct_runs": "35.5",
+          "mean_first_day": "7.746478873239436"
+        }
+      ]
+    },
+    "omics": {
+      "flight_v2": {
+        "source": "outputs/omics/flight_v2",
+        "summary": {
+          "provenance": {
+            "arguments": {
+              "manifest": "data/osdr/manifest.json",
+              "demo": false,
+              "ug": "flight_ug",
+              "ref": "ground_1g",
+              "gmt": null,
+              "program_map": null,
+              "factors": 5,
+              "fit_beta": false,
+              "cycles": 1.0,
+              "out": "outputs/omics/flight_v2",
+              "seed": 0,
+              "group_col": "donor_id",
+              "strata_cols": "pairing_stratum",
+              "independent_samples": false
+            },
+            "sha256": {
+              "/mnt/d/ORBIO/run_omics.py": "caa14c943274c5878137c867ee051dab13ba7eb347d7a9e5b9598ab87dff96d5",
+              "/mnt/d/ORBIO/orbio/omics.py": "3cdcc5ddfa208ac6eec4e3210f2e607ff59db34237a47725dfe60deb775e71ee",
+              "/mnt/d/ORBIO/data/osdr/manifest.json": "8717e3f2c4b609be8e0ba2484347dc40de259e922861a1ea1fb57f30cb7b03c1",
+              "/mnt/d/ORBIO/data/osdr/samples.csv": "04c7fcf9e3da31fd4a7e60b7d5984e10b40e3836012028fb3527753819720069",
+              "/mnt/d/ORBIO/data/osdr/GLDS-716_rna_seq_Normalized_Counts_rRNArm_GLbulkRNAseq.csv": "4653f95c2c49dac4acfc6a32aac8993107004b024d1a7447c0e2ccd4842933da",
+              "/mnt/d/ORBIO/data/osdr/GLDS-720_rna_seq_Normalized_Counts_rRNArm_GLbulkRNAseq.csv": "dd0303f421ce327710175853b3c567b13a5dbcc9eef9661353ccae6640b5794e",
+              "/mnt/d/ORBIO/data/osdr/GLDS-768_rna_seq_Normalized_Counts_rRNArm_GLbulkRNAseq.csv": "bdb027947238b6b777e70cf3e462138ac78f8fd54d6ed780b4b9aa11e3f0ea5e",
+              "/mnt/d/ORBIO/data/osdr/ensembl_to_symbol.csv": "197f4fae147462b55991a21b0fc09c35261a5ad88d0828e9b8779e51f7c9ebb9"
+            }
+          },
+          "design": {
+            "group_col": "donor_id",
+            "strata_cols": [
+              "pairing_stratum"
+            ]
+          },
+          "independent_samples": false,
+          "seed": 0,
+          "layers": {
+            "transcriptome": 50
+          },
+          "mfa_explained": [
+            0.1373,
+            0.1234,
+            0.078,
+            0.0497,
+            0.0461
+          ],
+          "beta": "prior",
+          "prior": {
+            "neural": {
+              "ug_prolif_mult": 0.9109,
+              "ug_apop_mult": 0.9873
+            }
+          }
+        },
+        "prior": {
+          "created": "2026-10-03",
+          "source_studies": [
+            "OSD-863",
+            "OSD-871",
+            "OSD-940"
+          ],
+          "layers_used": [
+            "transcriptome"
+          ],
+          "tissues": {
+            "neural": {
+              "m_prolif_ug": {
+                "mean": 0.9108623903814316,
+                "log_sd": 0.07172507914804725,
+                "delta_score": -0.6224229766682631,
+                "delta_sd": 0.19770867145278573,
+                "program": "proliferation",
+                "layer": "combined"
+              },
+              "m_apop_ug": {
+                "mean": 0.9873438466581835,
+                "log_sd": 0.06432692124191478,
+                "delta_score": -0.042456415590392704,
+                "delta_sd": 0.17684958640416484,
+                "program": "apoptosis_balance",
+                "layer": "combined"
+              },
+              "o2_uptake_mult": {
+                "mean": 0.9751468210701791,
+                "log_sd": 0.02897818215575531,
+                "delta_score": -0.25167233608176004,
+                "delta_sd": 0.10157396161507914,
+                "program": "oxphos",
+                "layer": "combined"
+              },
+              "glc_uptake_mult": {
+                "mean": 1.0696281648930301,
+                "log_sd": 0.07404821805606293,
+                "delta_score": 0.6731107863264882,
+                "delta_sd": 0.218215179420178,
+                "program": "glycolysis",
+                "layer": "combined"
+              },
+              "c_adh_mult": {
+                "mean": 0.9855456523007461,
+                "log_sd": 0.026003577647009828,
+                "delta_score": -0.145598294635578,
+                "delta_sd": 0.15234786123148944,
+                "program": "adhesion",
+                "layer": "combined"
+              }
+            }
+          },
+          "links": {
+            "m_prolif_ug": {
+              "mean": 0.15,
+              "sd": 0.1
+            },
+            "m_apop_ug": {
+              "mean": 0.3,
+              "sd": 0.2
+            },
+            "o2_uptake_mult": {
+              "mean": 0.1,
+              "sd": 0.1
+            },
+            "glc_uptake_mult": {
+              "mean": 0.1,
+              "sd": 0.1
+            },
+            "c_adh_mult": {
+              "mean": 0.1,
+              "sd": 0.1
+            }
+          },
+          "notes": [
+            "m = exp(beta*\u0394score); \u0394score = \u00b5g \u2212 1g programme score (z units)",
+            "beta values are priors [ASSUMPTION] unless fitted with fit_beta()",
+            "Programme gene sets: DEFAULT_PROGRAMS unless a GMT was supplied",
+            "m_prolif_ug link: prior",
+            "Contrast design: {'group_col': 'donor_id', 'strata_cols': ['pairing_stratum']}; independent_samples=False"
+          ]
+        }
+      },
+      "crc": {
+        "source": "outputs/omics/crc",
+        "summary": {
+          "layers": {
+            "transcriptome": 50
+          },
+          "mfa_explained": [
+            0.1373,
+            0.1234,
+            0.078,
+            0.0497,
+            0.0461
+          ],
+          "beta": "prior",
+          "prior": {
+            "crc_tumor_organoid": {
+              "m_prolif_ug": 1.0723,
+              "m_apop_ug": 1.0011,
+              "o2_uptake_mult": 0.9936,
+              "glc_uptake_mult": 0.9844,
+              "c_adh_mult": 0.998
+            }
+          }
+        }
+      }
+    }
+  },
+  "real_data_example": {
+    "label": "Neural proliferation program",
+    "delta_score": -0.6224229766682631,
+    "delta_sd": 0.19770867145278573,
+    "mapped_multiplier": 0.9108623903814316,
+    "source": "outputs/omics/flight_v2/omics_prior.json",
+    "caveat": "Direction supported by data; mapping magnitude remains model-dependent."
+  },
+  "limitations": [
+    "Sparse real-flight data.",
+    "Many magnitude parameters remain assumptions.",
+    "Simulated microgravity analogues are not real flight.",
+    "Vibration and g-jitter are not yet integrated into the current simulator.",
+    "Current drug types are archetypes, not compound-specific models.",
+    "The molecular layer is still limited.",
+    "The current twin assimilates growth state rather than the full cellular or GNN state.",
+    "Predictions should not be treated as biological or clinical truth."
+  ]
+}
