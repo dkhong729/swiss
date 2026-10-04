@@ -1,10 +1,10 @@
 import { radialFieldAt } from "./scenario-model.js";
 
 const CELL_COLORS = {
-  proliferating: "#367f9d",
-  quiescent: "#6c9291",
-  apoptotic: "#ad7b70",
-  necrotic: "#59636b"
+  proliferating: "#7FC9F2",
+  quiescent: "#7D90A6",
+  apoptotic: "#C98A8F",
+  necrotic: "#4A5668"
 };
 const PARTICLE_CAPACITY = 1000;
 const FOUNDER_COUNT = 130;
@@ -657,8 +657,8 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       colorByFate = Object.fromEntries(Object.entries(CELL_COLORS).map(([key, value]) => [key, new THREE.Color(value)]));
       apoptoticFade = new THREE.Color("#eef1f0");
-      oxygenLow = new THREE.Color("#d36d5d");
-      oxygenHigh = new THREE.Color("#0f79c8");
+      oxygenLow = new THREE.Color("#C98A8F");
+      oxygenHigh = new THREE.Color("#7FC9F2");
       oxygenColor = new THREE.Color();
       glucoseLow = new THREE.Color("#e3b04b");
       glucoseHigh = new THREE.Color("#3b9d85");
@@ -684,7 +684,7 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
         new THREE.MeshBasicMaterial({ color: 0xd36d5d, transparent: true, opacity: 0.08, depthWrite: false }));
       organoid.add(coreMesh);
       cystLumen = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 16),
-        new THREE.MeshBasicMaterial({ color: 0xf7f4ee, transparent: true, opacity: 0.9 }));
+        new THREE.MeshBasicMaterial({ color: 0xC3D6E4, transparent: true, opacity: 0.9 }));
       organoid.add(cystLumen);
       tissueFill = new THREE.Mesh(new THREE.SphereGeometry(1, 48, 32),
         new THREE.MeshStandardMaterial({ color: 0x3f7f94, roughness: 0.9, metalness: 0 }));
@@ -699,13 +699,13 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
         color: 0x8fb8b1, transparent: true, opacity: 0.035, depthWrite: false, side: THREE.DoubleSide }));
       organoid.add(transportBody);
       transportCore = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 16),
-        new THREE.MeshBasicMaterial({ color: 0x0f79c8, transparent: true, opacity: 0.4, depthWrite: false }));
+        new THREE.MeshBasicMaterial({ color: 0x7FC9F2, transparent: true, opacity: 0.4, depthWrite: false }));
       organoid.add(transportCore);
       glucoseShell = new THREE.Mesh(surfaceGeometry,
         new THREE.MeshBasicMaterial({ color: 0x579b88, wireframe: true, transparent: true, opacity: 0.12 }));
       organoid.add(glucoseShell);
       floorPlane = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 3.2),
-        new THREE.MeshBasicMaterial({ color: 0x102235, transparent: true, opacity: 0.06, side: THREE.DoubleSide }));
+        new THREE.MeshBasicMaterial({ color: 0xDCE3EB, transparent: true, opacity: 0.06, side: THREE.DoubleSide }));
       floorPlane.rotation.x = -Math.PI / 2;
       organoid.add(floorPlane);
       sectionCanvas = document.createElement("canvas");

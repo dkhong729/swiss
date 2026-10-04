@@ -1,61 +1,54 @@
-# swiss
+# ORBIO website
 
-ORBIO's public website: two static information pages and a Flask-powered
-interactive virtual experiment.
+Static. No Python, no Flask, no build step.
 
-## Run the interactive experiment
+## Run it locally
 
-From this directory:
+From this folder:
 
-```powershell
-python -m pip install -r requirements.txt
-python app.py
-```
+    python -m http.server 8080
 
-Open `http://127.0.0.1:5000/`.
+Open http://127.0.0.1:8080/
 
-The app bundles its corrected-run metadata and paired omics contrasts in
-`data/`. The browser experiment provides 50 gravity × tissue × morphology
-conditions and a 71-step Day 0–7 trajectory.
+In VS Code over Remote-SSH, open the Ports panel, find 8080 and click the globe icon.
 
-## Serve the static pages
+## What is where
 
-From this directory:
+    index.html        the three pages (Project, Technology, Team), one file
+    experiment/       the interactive virtual experiment
+      index.html      was templates/virtual_experiment.html; its two data blobs
+                      are now written into the page, so Flask is no longer needed
+      css/ js/        unchanged copies of the original static/css and static/js
 
-```powershell
-python -m http.server 8080
-```
+The experiment is embedded in the Project page, below the hero, through an
+iframe, and also opens on its own at /experiment/.
 
-Open `http://127.0.0.1:8080/` for the model overview and
-`http://127.0.0.1:8080/explore/` for results. The static pages can be hosted
-with GitHub Pages. The Flask virtual experiment requires a Python application
-host; set `HOST` and `PORT` to match that host.
+## Updating the experiment data
 
-## Corrected-run provenance
+The page carries two objects that used to come from app.py:
 
-The displayed run details are derived from
-`outputs/pipeline_corrected_v2/summary.json`. This profile records:
+    window.ORBIO_REPOSITORY_OMICS   from data/outputs/omics/*/gravity_contrast.csv
+    window.ORBIO_RUN_METADATA       from data/run_metadata.json
 
-- NVIDIA GeForce RTX 5070 Ti, 15.9 GB VRAM, CUDA 12.8, and PyTorch
-  2.11.0+cu128; compute capability 12.0 with BF16 supported and AMP enabled.
-- 480 scenarios, 4 workers, a 48³ field grid at 20 µm spacing, and a
-  5,000-agent cap.
-- 768 cells per graph, encoder training for 60 epochs, prediction heads for
-  400 epochs, an 8-model ensemble, and graph batches of 32.
+If a new run changes them, regenerate those two <script> lines near the top of
+experiment/index.html. Everything else in the experiment is computed in the
+browser and needs no server.
 
-The compact, website-ready record is `data/run_metadata.json`. The neural
-flight and CRC clinostat contrasts are bundled under
-`data/outputs/omics/`; the interface identifies their original output paths.
-The website uses these bundled records as its runtime science data.
+## Not included
 
-## Website files
+The old src/, index.html and explore/ static pages were left out on purpose.
 
-- `index.html`, `explore/`, `src/`, and `public/` contain the static pages and
-  their assets.
-- `app.py`, `templates/`, and `static/` contain the interactive experiment.
-- `data/` contains the small provenance records required by the Flask app.
+## Still to do
 
-## Deploy on Render
+Site copy has not been verified by the team yet.
 
-The repo includes [render.yaml](render.yaml). Create a Render Blueprint (or a Web Service) from this repository. Build: `pip install -r requirements.txt`. Start: `gunicorn app:app --bind 0.0.0.0:$PORT`.
+## When a new swiss-main drop arrives
 
+Run the rebuild script, which re-applies every ORBIO customisation (palette,
+white-disc wordmark, chart colours, chart sizing, hidden source lines, embedded
+mode, mountain footer, iframe height reporting):
+
+    python3 rebuild.py path/to/swiss-main path/to/new/orbio-web path/to/current/orbio-web
+
+The site shell (index.html, assets/) is copied from the current build, so only
+the experiment is refreshed.

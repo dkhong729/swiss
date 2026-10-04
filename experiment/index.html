@@ -3,18 +3,27 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#f7f4ee">
+    <meta name="theme-color" content="#0A1322">
     <meta name="description" content="Explore an ORBIO virtual organoid experiment across gravity, tissue and morphology.">
     <title>ORBIO — Virtual Experiment</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/orbio.css') }}">
-    <script>window.ORBIO_REPOSITORY_OMICS = {{ omics_data | tojson }};</script>
-    <script>window.ORBIO_RUN_METADATA = {{ run_metadata | tojson }};</script>
-    <script type="module" src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+      html.embedded .site-header, html.embedded .site-footer-mountains, html.embedded .site-footer-note { display: none; }
+      html.embedded body { background: transparent; }
+      html.embedded, html.embedded body { overflow: visible; height: auto; }
+    </style>
+    <script>if (window.self !== window.top) document.documentElement.classList.add("embedded");</script>
+    <link rel="stylesheet" href="./css/orbio.css">
+    <script>window.ORBIO_REPOSITORY_OMICS = {"neural": {"flight_ug": {"programs": {"adhesion": {"delta": -0.145598294635578, "sd": 0.15234786123148944, "n": 4}, "anti_apoptosis": {"delta": -0.14685278902188947, "sd": 0.09764647799993573, "n": 4}, "apoptosis": {"delta": -0.18930920461228212, "sd": 0.11009302681541407, "n": 4}, "apoptosis_balance": {"delta": -0.042456415590392704, "sd": 0.17684958640416484, "n": 4}, "glycolysis": {"delta": 0.6731107863264882, "sd": 0.218215179420178, "n": 4}, "hypoxia": {"delta": 0.23250503822302152, "sd": 0.13559175500040022, "n": 4}, "oxphos": {"delta": -0.25167233608176004, "sd": 0.10157396161507914, "n": 4}, "proliferation": {"delta": -0.6224229766682631, "sd": 0.19770867145278573, "n": 4}}, "sourceFile": "outputs/omics/flight_v2/gravity_contrast.csv", "contrast": "flight_ug vs ground_1g", "detail": "Paired biological units (n=4 pairs); combined transcriptome score."}}, "crc_tumor_organoid": {"sim_ug_clinostat": {"programs": {"proliferation": {"delta": 0.46508131819, "sd": 0.49546871905215467, "n": 4}, "apoptosis": {"delta": -0.15997327657822152, "sd": 0.2572763639975586, "n": 4}, "anti_apoptosis": {"delta": -0.163667553776413, "sd": 0.19129070204279786, "n": 4}, "hypoxia": {"delta": 0.1145579800136083, "sd": 0.3670883589285328, "n": 4}, "glycolysis": {"delta": -0.15680235807698323, "sd": 0.3586503501952954, "n": 4}, "adhesion": {"delta": -0.02011611000264104, "sd": 0.15788393160092754, "n": 4}, "oxphos": {"delta": -0.06418262074815408, "sd": 0.3718941965968242, "n": 4}, "apoptosis_balance": {"delta": 0.003694277198191452, "sd": 0.28757494521001714, "n": 4}}, "sourceFile": "outputs/omics/crc/gravity_contrast.csv", "contrast": "sim_ug_clinostat vs ground_1g", "detail": "Clinostat organoid contrast (n=4 per arm); combined score."}}};</script>
+    <script>window.ORBIO_RUN_METADATA = {"available": true, "source": "outputs/pipeline_corrected_v2/summary.json", "profile": {"name": "rtx5070ti", "grid_n": 90, "grid_h": 20.0, "max_agents": 90000, "pair_chunk": 4096, "n_scenarios": 480, "workers": 4, "cells_per_graph": 768, "encoder_epochs": 60, "head_epochs": 400, "ensemble": 8, "graph_batch": 32, "al_baselines": 24, "al_rounds": 5, "al_batch": 8, "sensitivity": true, "amp": true}, "gpu": {"name": "NVIDIA GeForce RTX 5070 Ti", "vramGb": 15.9, "torch": "2.11.0+cu128", "cudaBuild": "12.8", "computeCapability": "12.0", "architecture": ["sm_75", "sm_80", "sm_86", "sm_90", "sm_100", "sm_120"], "bf16": true}, "quality": {"attempted": 480, "capped": 127, "retained": 353, "policy": "exclude", "scopeNote": "Metrics describe the uncensored subset; cap exclusions may change the scenario distribution."}, "physics": {"jacobiIterations": 40, "d_o2": 7200000.0, "d_glc": 2000000.0, "o2Hypoxic": 0.25, "o2ProliferationSaturation": 0.6, "o2Necrotic": 0.08, "glucoseMinimum": 0.15, "cycleHours": 22.0, "simulationStepHours": 1.0}, "initialization": {"datasetMinimumAgents": 100, "datasetMaximumAgents": 160, "scenarioDefaultAgents": 120, "source": "orbio/data.py dataset generator and orbio/config.py Scenario.n0"}, "architecture": {"encoder": "GNN / kNN EdgeConv", "inputFeatures": 12, "nearestNeighbours": 10, "embeddingDimensions": 64, "pretraining": "Contrastive NT-Xent"}, "faceValidity": {"source": "outputs/pipeline_corrected_v2/summary.json", "definition": "ln(viable volume Day 7 / viable volume Day 1), uncensored untreated runs", "scope": "descriptive, unmatched simulated groups; hardware and morphology may differ", "byTissueAndGravity": {"generic": {"ground_1g": {"n": 6, "median_log_fold": 2.4892590061984396}, "flight_1g_ctrl": {"n": 3, "median_log_fold": 2.062660545086315}, "flight_ug": {"n": 5, "median_log_fold": 2.2421879841330323}, "sim_ug_rpm": {"n": 2, "median_log_fold": 2.840484751702496}, "sim_ug_clinostat": {"n": 1, "median_log_fold": 2.243744536396447}}, "neural": {"ground_1g": {"n": 3, "median_log_fold": 2.2710319103443566}, "flight_1g_ctrl": {"n": 1, "median_log_fold": 1.9412911458864732}, "flight_ug": {"n": 4, "median_log_fold": 2.2195356580525063}, "sim_ug_rpm": {"n": 3, "median_log_fold": 2.698170489113342}, "sim_ug_clinostat": {"n": 4, "median_log_fold": 2.686818581394352}}, "cardiac": {"ground_1g": {"n": 0, "median_log_fold": null}, "flight_1g_ctrl": {"n": 3, "median_log_fold": 2.111300359671858}, "flight_ug": {"n": 0, "median_log_fold": null}, "sim_ug_rpm": {"n": 0, "median_log_fold": null}, "sim_ug_clinostat": {"n": 0, "median_log_fold": null}}, "crc_tumor_organoid": {"ground_1g": {"n": 1, "median_log_fold": 2.3037927843216166}, "flight_1g_ctrl": {"n": 5, "median_log_fold": 2.3098620407317063}, "flight_ug": {"n": 3, "median_log_fold": 2.1155211350804675}, "sim_ug_rpm": {"n": 2, "median_log_fold": 3.1413780547239663}, "sim_ug_clinostat": {"n": 1, "median_log_fold": 2.77148384582273}}, "cancer_cellline_spheroid": {"ground_1g": {"n": 6, "median_log_fold": 2.3892015718504287}, "flight_1g_ctrl": {"n": 2, "median_log_fold": 2.5158291962027377}, "flight_ug": {"n": 5, "median_log_fold": 2.322671875261673}, "sim_ug_rpm": {"n": 3, "median_log_fold": 2.9422934494433552}, "sim_ug_clinostat": {"n": 3, "median_log_fold": 2.494183630332319}}}}, "sensitivity": {"source": "outputs/pipeline_corrected_v2/summary.json", "method": "one parameter at a time, ?50%, Day-7 log fold vs stochastic noise", "conditions": {"ground_1g": {"baseline": -2.849882334749297, "noiseSd": 0.48080943216836936, "params": {"cycle_h (doubling time)": [1.6858640358934198, -4.209655380235707], "k_o2 (O2 uptake)": [-2.245426713015699, -2.245426713015699], "D_o2 (O2 diffusivity)": [-2.245426713015699, -2.245426713015699], "boundary layer (gravity-specific)": [-2.833213377917818, -2.173967699408793], "o2_hypoxic threshold": [-2.245426713015699, -2.245426713015699], "tissue \u7e55g proliferation mult.": [-2.245426713015699, -2.245426713015699], "medium O2 draw (hardware)": [-2.245426713015699, -2.245426713015699], "drug EC50": [-3.9318255946300247, -0.9665525708441075]}}, "flight_ug": {"baseline": -2.659631717641506, "noiseSd": 0.2706849777390475, "params": {"cycle_h (doubling time)": [1.1218068481421324, -3.1306515594341495], "k_o2 (O2 uptake)": [-2.3328904300974282, -2.3328904300974282], "D_o2 (O2 diffusivity)": [-2.3328904300974282, -2.3328904300974282], "boundary layer (gravity-specific)": [-2.7577735947593864, -2.064626414199441], "o2_hypoxic threshold": [-2.3328904300974282, -2.3328904300974282], "tissue \u7e55g proliferation mult.": [-6.907755278982137, -0.15333410215602622], "medium O2 draw (hardware)": [-2.3328904300974282, -2.3328904300974282], "drug EC50": [-3.79922755424155, -1.3714792336394956]}}}}};</script>
+    <script type="module" src="./js/app.js"></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to experiment</a>
     <header class="site-header">
-      <a class="wordmark" href="/" aria-label="ORBIO virtual experiment home">
+      <a class="wordmark" href="../#technology" target="_top" aria-label="ORBIO virtual experiment home">
         <span class="wordmark-mark" aria-hidden="true"></span><span>ORBIO</span>
       </a>
       <span class="header-context">VIRTUAL EXPERIMENT</span>
@@ -69,10 +78,6 @@
     </aside>
 
     <main id="main">
-      <details class="run-details">
-        <summary>Model &amp; run details <span data-run-metadata-state>Loading run metadata…</span></summary>
-        <div class="model-info-grid" id="global-run-info"></div>
-      </details>
       <section class="experiment-section" aria-labelledby="experiment-title">
         <div class="section-heading">
           <div>
@@ -293,16 +298,65 @@
           <p class="source-line" id="omics-source-line"></p>
           <p class="figure-footnote" id="omics-footnote"></p>
         </div>
-        <details class="figure-info">
-          <summary>Dataset &amp; calibration provenance</summary>
-          <div class="model-info-grid" id="omics-model-info"></div>
-        </details>
-      </section>
+              </section>
     </main>
 
-    <footer class="site-footer">
-      <span>ORBIO <span aria-hidden="true">·</span> Virtual organoid</span>
-      <span>Reduced mechanistic model</span>
-    </footer>
+    <div class="site-footer-mountains" data-orbio-mountains aria-hidden="true"><canvas></canvas></div>
+    <p class="site-footer-note">ORBIO is a research prototype. The trajectories above come from a browser-side surrogate of the simulator, not a live run of the full model.</p>
+    <script>
+(()=>{document.querySelectorAll('[data-orbio-mountains]').forEach(root=>{if(root.dataset.initialized)return;root.dataset.initialized='true';
+const canvas=root.querySelector('canvas'),ctx=canvas.getContext('2d');if(!ctx)return;
+const RAND=(i)=>{const x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x)};
+const RIDGES=[
+ {pts:[[0,.80],[.06,.62],[.13,.70],[.21,.44],[.28,.66],[.36,.38],[.44,.62],[.53,.48],[.61,.70],[.72,.34],[.83,.64],[.93,.47],[1,.74]],k:'--mountain-back',snow:.50,shade:.22},
+ {pts:[[0,.95],[.09,.78],[.18,.83],[.31,.24],[.40,.68],[.47,.57],[.57,.88],[.66,.62],[.73,.76],[.85,.42],[.95,.78],[1,.72]],k:'--mountain-front',snow:.42,shade:.30}];
+function mix(a,b,t){const p=c=>{c=c.replace('#','');return[parseInt(c.slice(0,2),16),parseInt(c.slice(2,4),16),parseInt(c.slice(4,6),16)]};
+ const A=p(a),B=p(b);return`rgb(${A.map((v,i)=>Math.round(v+(B[i]-v)*t)).join(',')})`}
+function draw(){const b=root.getBoundingClientRect(),w=b.width,h=b.height;if(!w||!h)return;
+const d=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(w*d);canvas.height=Math.round(h*d);ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,w,h);
+const cs=getComputedStyle(root),C=n=>cs.getPropertyValue(n).trim();
+const rock=C('--mountain-rock'),haze=C('--mountain-haze'),fog=C('--mountain-fog');
+RIDGES.forEach((R,li)=>{const base=C(R.k),lit=mix(base,rock,.55),snow=li?C('--mountain-snow-secondary'):C('--mountain-snow');
+ ctx.beginPath();ctx.moveTo(0,h);R.pts.forEach(p=>ctx.lineTo(p[0]*w,p[1]*h));ctx.lineTo(w,h);ctx.closePath();ctx.fillStyle=base;ctx.fill();
+ for(let i=1;i<R.pts.length-1;i++){const a=R.pts[i-1],p=R.pts[i],c=R.pts[i+1];
+  if(p[1]<a[1]&&p[1]<c[1]){ctx.beginPath();ctx.moveTo(p[0]*w,p[1]*h);ctx.lineTo(c[0]*w,c[1]*h);
+   ctx.lineTo(((p[0]+c[0])/2)*w,Math.min(h,((p[1]+c[1])/2+0.10)*h));ctx.closePath();
+   ctx.globalAlpha=R.shade;ctx.fillStyle=lit;ctx.fill();ctx.globalAlpha=1;const sp=R.snow;
+   ctx.beginPath();ctx.moveTo(p[0]*w,p[1]*h);
+   ctx.lineTo((p[0]+(a[0]-p[0])*sp*.55)*w,(p[1]+(a[1]-p[1])*sp*.55)*h);
+   ctx.lineTo((p[0]+(a[0]-p[0])*sp*.3)*w,(p[1]+(a[1]-p[1])*sp*.42+.012)*h);
+   ctx.lineTo((p[0]+(c[0]-p[0])*sp*.34)*w,(p[1]+(c[1]-p[1])*sp*.5+.015)*h);
+   ctx.lineTo((p[0]+(c[0]-p[0])*sp*.62)*w,(p[1]+(c[1]-p[1])*sp*.62)*h);
+   ctx.closePath();ctx.fillStyle=snow;ctx.globalAlpha=li?.75:.9;ctx.fill();ctx.globalAlpha=1}}
+ ctx.save();ctx.beginPath();ctx.moveTo(0,h);R.pts.forEach(p=>ctx.lineTo(p[0]*w,p[1]*h));ctx.lineTo(w,h);ctx.closePath();ctx.clip();
+ ctx.globalAlpha=.055;ctx.fillStyle=rock;
+ for(let i=0;i<220;i++){const x=RAND(i+li*500)*w,y=(0.2+RAND(i+li*500+77)*0.8)*h,r=0.6+RAND(i+li*500+9)*1.5;ctx.beginPath();ctx.arc(x,y,r,0,6.3);ctx.fill()}
+ ctx.globalAlpha=1;ctx.restore();
+ if(li===0){const g=ctx.createLinearGradient(0,h*.45,0,h*.92);g.addColorStop(0,'transparent');g.addColorStop(1,haze);
+  ctx.globalAlpha=.30;ctx.fillStyle=g;ctx.fillRect(0,0,w,h);ctx.globalAlpha=1}});
+const g=ctx.createLinearGradient(0,h*.30,0,h);g.addColorStop(0,'transparent');g.addColorStop(.78,fog+'bb');g.addColorStop(1,fog);
+ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+const t=ctx.createLinearGradient(0,0,0,h*.34);t.addColorStop(0,fog);t.addColorStop(1,'transparent');ctx.fillStyle=t;ctx.fillRect(0,0,w,h*.34)}
+new ResizeObserver(draw).observe(root);draw()})})();
+    </script>
+    <script>
+(()=>{if(window.self===window.top)return;
+ let last=0;
+ const send=()=>{const h=Math.ceil(document.documentElement.scrollHeight);
+   if(Math.abs(h-last)>8){last=h;parent.postMessage({type:"orbio:height",height:h},"*")}};
+ addEventListener("load",send);addEventListener("resize",send);
+ new ResizeObserver(send).observe(document.documentElement);
+ new MutationObserver(send).observe(document.body,{subtree:true,childList:true,attributes:true});
+ setInterval(send,600);send();})();
+    </script>
+    <script>
+(()=>{if(window.self===window.top)return;let last=0;
+ const send=()=>{const h=Math.ceil(document.documentElement.scrollHeight);
+   if(Math.abs(h-last)>8){last=h;parent.postMessage({type:"orbio:height",height:h},"*")}};
+ addEventListener("load",send);addEventListener("resize",send);
+ new ResizeObserver(send).observe(document.documentElement);
+ new MutationObserver(send).observe(document.body,{subtree:true,childList:true,attributes:true});
+ setInterval(send,600);send();})();
+    </script>
   </body>
 </html>

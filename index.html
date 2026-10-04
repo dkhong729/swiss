@@ -1,332 +1,312 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ORBIO - A Virtual Organoid for Biology in Orbit</title>
-    <meta
-      name="description"
-      content="A public, visual explanation of ORBIO, a prototype virtual organoid for exploring biology in orbit."
-    >
-    <link rel="stylesheet" href="src/styles.css">
-    <script type="module" src="src/main.js"></script>
-  </head>
-  <body data-page="model">
-    <a class="skip-link" href="#main">Skip to content</a>
-    <header class="site-nav" data-nav>
-      <a class="wordmark" href="./" aria-label="ORBIO home">
-        <span class="wordmark-mark"></span>
-        <span>ORBIO</span>
-      </a>
-      <nav aria-label="Primary">
-        <a class="active" href="./">The Model</a>
-        <a href="explore/">Explore Results</a>
-        <a href="README.md">Technical Notes</a>
-      </nav>
-      <div class="scroll-progress" data-progress></div>
-    </header>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ORBIO — rehearse space biology before you fly it</title>
+<meta name="description" content="A virtual organoid for microgravity: compare experiment designs on the ground, then follow them in orbit.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2232%22%20fill%3D%22%23FFFFFF%22/%3E%3Cg%20transform%3D%22translate%2832%2032%29%20scale%280.84%29%20translate%28-32%20-32%29%22%3E%3Cpath%20d%3D%22M%2021.00%2050.50%20L%2022.57%2050.00%20L%2023.06%2049.68%20L%2023.41%2049.39%20L%2023.69%2049.12%20L%2023.93%2048.85%20L%2024.15%2048.59%20L%2024.34%2048.34%20L%2024.52%2048.09%20L%2024.69%2047.84%20L%2024.85%2047.60%20L%2025.00%2047.37%20L%2025.15%2047.14%20L%2025.28%2046.91%20L%2025.42%2046.68%20L%2025.55%2046.46%20L%2025.68%2046.24%20L%2025.80%2046.03%20L%2025.92%2045.81%20L%2026.04%2045.60%20L%2026.16%2045.40%20L%2026.28%2045.19%20L%2026.39%2044.99%20L%2026.50%2044.79%20L%2026.61%2044.59%20L%2026.72%2044.39%20L%2026.83%2044.20%20L%2026.94%2044.01%20L%2027.05%2043.82%20L%2027.15%2043.64%20L%2027.26%2043.45%20L%2027.36%2043.27%20L%2027.47%2043.09%20L%2027.57%2042.91%20L%2027.67%2042.74%20L%2027.77%2042.56%20L%2027.88%2042.39%20L%2027.98%2042.22%20L%2028.08%2042.06%20L%2028.18%2041.89%20L%2028.28%2041.73%20L%2028.38%2041.57%20L%2028.48%2041.41%20L%2028.57%2041.25%20L%2028.67%2041.10%20L%2028.77%2040.94%20L%2028.87%2040.79%20L%2028.96%2040.64%20L%2029.06%2040.49%20L%2029.16%2040.34%20L%2029.25%2040.20%20L%2029.35%2040.06%20L%2029.44%2039.91%20L%2029.53%2039.77%20L%2029.63%2039.64%20L%2029.72%2039.50%20L%2029.81%2039.36%20L%2029.91%2039.23%20L%2030.00%2039.10%20L%2030.09%2038.96%20L%2030.18%2038.83%20L%2030.27%2038.71%20L%2030.36%2038.58%20L%2030.45%2038.45%20L%2030.54%2038.33%20L%2030.62%2038.20%20L%2030.71%2038.08%20L%2030.80%2037.96%20L%2030.88%2037.84%20L%2030.97%2037.72%20L%2031.06%2037.60%20L%2031.14%2037.48%20L%2031.23%2037.36%20L%2031.31%2037.25%20L%2031.39%2037.13%20L%2031.48%2037.01%20L%2031.56%2036.90%20L%2031.64%2036.79%20L%2031.72%2036.67%20L%2031.80%2036.56%20L%2031.88%2036.45%20L%2031.96%2036.34%20L%2032.04%2036.22%20L%2032.12%2036.11%20L%2032.20%2036.00%20L%2032.27%2035.89%20L%2032.35%2035.78%20L%2032.43%2035.67%20L%2032.50%2035.56%20L%2032.58%2035.45%20L%2032.65%2035.34%20L%2032.73%2035.23%20L%2032.80%2035.12%20L%2032.88%2035.01%20L%2032.95%2034.90%20L%2033.03%2034.79%20L%2033.10%2034.68%20L%2033.17%2034.57%20L%2033.25%2034.46%20L%2033.32%2034.35%20L%2033.39%2034.23%20L%2033.46%2034.12%20L%2033.53%2034.01%20L%2033.61%2033.89%20L%2033.68%2033.78%20L%2033.75%2033.67%20L%2033.82%2033.55%20L%2033.89%2033.43%20L%2033.96%2033.32%20L%2034.04%2033.20%20L%2034.11%2033.08%20L%2034.18%2032.96%20L%2034.25%2032.84%20L%2034.32%2032.72%20L%2034.40%2032.60%20L%2034.47%2032.48%20L%2034.54%2032.35%20L%2034.61%2032.23%20L%2034.69%2032.10%20L%2034.76%2031.98%20L%2034.83%2031.85%20L%2034.91%2031.72%20L%2034.98%2031.59%20L%2035.06%2031.46%20L%2035.14%2031.33%20L%2035.21%2031.20%20L%2035.29%2031.06%20L%2035.37%2030.93%20L%2035.44%2030.79%20L%2035.52%2030.65%20L%2035.60%2030.51%20L%2035.68%2030.37%20L%2035.76%2030.23%20L%2035.84%2030.09%20L%2035.93%2029.94%20L%2036.01%2029.80%20L%2036.10%2029.65%20L%2036.18%2029.50%20L%2036.27%2029.35%20L%2036.35%2029.20%20L%2036.44%2029.05%20L%2036.53%2028.89%20L%2036.62%2028.74%20L%2036.71%2028.58%20L%2036.80%2028.42%20L%2036.90%2028.26%20L%2036.99%2028.10%20L%2037.09%2027.94%20L%2037.19%2027.78%20L%2037.28%2027.61%20L%2037.38%2027.44%20L%2037.48%2027.28%20L%2037.59%2027.11%20L%2037.69%2026.93%20L%2037.79%2026.76%20L%2037.90%2026.59%20L%2038.01%2026.41%20L%2038.12%2026.23%20L%2038.23%2026.05%20L%2038.34%2025.87%20L%2038.45%2025.69%20L%2038.56%2025.51%20L%2038.68%2025.32%20L%2038.80%2025.13%20L%2038.92%2024.94%20L%2039.04%2024.75%20L%2039.16%2024.56%20L%2039.28%2024.36%20L%2039.41%2024.17%20L%2039.53%2023.97%20L%2039.66%2023.77%20L%2039.79%2023.57%20L%2039.92%2023.36%20L%2040.05%2023.16%20L%2040.18%2022.95%20L%2040.32%2022.73%20L%2040.45%2022.52%20L%2040.59%2022.30%20L%2040.73%2022.09%20L%2040.87%2021.86%20L%2041.01%2021.64%20L%2041.15%2021.41%20L%2041.29%2021.18%20L%2041.43%2020.94%20L%2041.58%2020.70%20L%2041.72%2020.46%20L%2041.87%2020.21%20L%2042.01%2019.95%20L%2042.16%2019.69%20L%2042.30%2019.43%20L%2042.45%2019.15%20L%2042.59%2018.87%20L%2042.73%2018.57%20L%2042.87%2018.26%20L%2043.00%2017.93%20L%2043.13%2017.59%20L%2043.24%2017.21%20L%2043.35%2016.79%20L%2043.42%2016.31%20L%2043.45%2015.69%20L%2043.00%2014.00%20L%2043.00%2014.00%20L%2042.04%2012.54%20L%2041.54%2012.15%20L%2041.11%2011.90%20L%2040.70%2011.72%20L%2040.31%2011.58%20L%2039.93%2011.47%20L%2039.57%2011.38%20L%2039.21%2011.31%20L%2038.85%2011.26%20L%2038.50%2011.22%20L%2038.16%2011.19%20L%2037.82%2011.16%20L%2037.48%2011.15%20L%2037.15%2011.14%20L%2036.81%2011.14%20L%2036.49%2011.15%20L%2036.16%2011.16%20L%2035.84%2011.18%20L%2035.51%2011.20%20L%2035.19%2011.23%20L%2034.87%2011.26%20L%2034.56%2011.30%20L%2034.24%2011.34%20L%2033.93%2011.39%20L%2033.62%2011.44%20L%2033.31%2011.49%20L%2033.00%2011.55%20L%2032.70%2011.61%20L%2032.39%2011.67%20L%2032.09%2011.74%20L%2031.79%2011.81%20L%2031.49%2011.88%20L%2031.19%2011.96%20L%2030.90%2012.04%20L%2030.60%2012.12%20L%2030.31%2012.21%20L%2030.02%2012.30%20L%2029.73%2012.39%20L%2029.44%2012.49%20L%2029.15%2012.59%20L%2028.86%2012.69%20L%2028.58%2012.80%20L%2028.30%2012.91%20L%2028.02%2013.02%20L%2027.74%2013.13%20L%2027.46%2013.25%20L%2027.18%2013.37%20L%2026.91%2013.49%20L%2026.64%2013.62%20L%2026.37%2013.74%20L%2026.10%2013.87%20L%2025.83%2014.01%20L%2025.57%2014.15%20L%2025.30%2014.29%20L%2025.04%2014.43%20L%2024.78%2014.57%20L%2024.52%2014.72%20L%2024.27%2014.87%20L%2024.01%2015.03%20L%2023.76%2015.18%20L%2023.51%2015.34%20L%2023.26%2015.50%20L%2023.01%2015.67%20L%2022.77%2015.83%20L%2022.53%2016.00%20L%2022.29%2016.18%20L%2022.05%2016.35%20L%2021.81%2016.53%20L%2021.58%2016.71%20L%2021.35%2016.90%20L%2021.12%2017.08%20L%2020.89%2017.27%20L%2020.67%2017.46%20L%2020.45%2017.65%20L%2020.23%2017.85%20L%2020.01%2018.05%20L%2019.79%2018.25%20L%2019.58%2018.45%20L%2019.37%2018.66%20L%2019.17%2018.87%20L%2018.96%2019.08%20L%2018.76%2019.29%20L%2018.56%2019.51%20L%2018.36%2019.73%20L%2018.17%2019.95%20L%2017.98%2020.17%20L%2017.79%2020.40%20L%2017.60%2020.62%20L%2017.42%2020.85%20L%2017.24%2021.09%20L%2017.07%2021.32%20L%2016.89%2021.56%20L%2016.72%2021.79%20L%2016.55%2022.03%20L%2016.39%2022.28%20L%2016.23%2022.52%20L%2016.07%2022.77%20L%2015.91%2023.01%20L%2015.76%2023.26%20L%2015.61%2023.52%20L%2015.46%2023.77%20L%2015.32%2024.03%20L%2015.18%2024.28%20L%2015.04%2024.54%20L%2014.91%2024.80%20L%2014.78%2025.06%20L%2014.65%2025.33%20L%2014.53%2025.59%20L%2014.41%2025.86%20L%2014.30%2026.13%20L%2014.18%2026.39%20L%2014.07%2026.67%20L%2013.97%2026.94%20L%2013.86%2027.21%20L%2013.76%2027.48%20L%2013.67%2027.76%20L%2013.58%2028.04%20L%2013.49%2028.31%20L%2013.40%2028.59%20L%2013.32%2028.87%20L%2013.24%2029.15%20L%2013.17%2029.43%20L%2013.09%2029.72%20L%2013.03%2030.00%20L%2012.96%2030.28%20L%2012.90%2030.57%20L%2012.84%2030.85%20L%2012.79%2031.14%20L%2012.74%2031.42%20L%2012.69%2031.71%20L%2012.65%2032.00%20L%2012.61%2032.29%20L%2012.58%2032.57%20L%2012.54%2032.86%20L%2012.51%2033.15%20L%2012.49%2033.44%20L%2012.47%2033.73%20L%2012.45%2034.02%20L%2012.43%2034.31%20L%2012.42%2034.60%20L%2012.41%2034.89%20L%2012.41%2035.18%20L%2012.41%2035.46%20L%2012.41%2035.75%20L%2012.42%2036.04%20L%2012.43%2036.33%20L%2012.44%2036.62%20L%2012.46%2036.91%20L%2012.48%2037.20%20L%2012.50%2037.49%20L%2012.53%2037.78%20L%2012.56%2038.06%20L%2012.59%2038.35%20L%2012.63%2038.64%20L%2012.67%2038.93%20L%2012.71%2039.21%20L%2012.76%2039.50%20L%2012.81%2039.78%20L%2012.86%2040.07%20L%2012.92%2040.35%20L%2012.98%2040.64%20L%2013.05%2040.92%20L%2013.12%2041.20%20L%2013.19%2041.48%20L%2013.26%2041.76%20L%2013.34%2042.04%20L%2013.42%2042.32%20L%2013.51%2042.60%20L%2013.60%2042.88%20L%2013.69%2043.16%20L%2013.79%2043.43%20L%2013.89%2043.71%20L%2013.99%2043.98%20L%2014.10%2044.26%20L%2014.22%2044.53%20L%2014.33%2044.80%20L%2014.45%2045.07%20L%2014.58%2045.34%20L%2014.71%2045.61%20L%2014.84%2045.87%20L%2014.98%2046.14%20L%2015.12%2046.40%20L%2015.27%2046.67%20L%2015.43%2046.93%20L%2015.59%2047.19%20L%2015.75%2047.45%20L%2015.93%2047.70%20L%2016.11%2047.96%20L%2016.30%2048.21%20L%2016.50%2048.46%20L%2016.71%2048.71%20L%2016.93%2048.96%20L%2017.17%2049.20%20L%2017.43%2049.44%20L%2017.71%2049.67%20L%2018.02%2049.90%20L%2018.37%2050.11%20L%2018.79%2050.32%20L%2019.35%2050.50%20L%2021.00%2050.50%20Z%22%20fill%3D%22%238A5A7A%22/%3E%3Cpath%20d%3D%22M%2041.01%2021.64%20Q%2038.45%2016.24%2035.19%2011.23%20Q%2041.02%2011.54%2043.52%2013.71%20Q%2043.75%2016.84%2041.01%2021.64%20Z%22%20fill%3D%22%23E8C98A%22/%3E%3Cg%20fill%3D%22%232B1418%22%3E%3Ccircle%20cx%3D%2220.28%22%20cy%3D%2228.13%22%20r%3D%221.8%22/%3E%3Ccircle%20cx%3D%2226.48%22%20cy%3D%2226.73%22%20r%3D%221.8%22/%3E%3C/g%3E%3Cg%20stroke%3D%22%232B1418%22%20fill%3D%22none%22%3E%3Cpath%20d%3D%22M%2020.68%2032.53%20q%203.0%202.4%205.8%20-0.7%22%20fill%3D%22none%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#0A1322; --deep:#111D30; --panel:#17253B; --panel-2:#1F2F49; --edge:#2C3E57;
+  --ice:#DCE3EB; --mist:#93A1B2; --signal:#C3D6E4; --bright:#7FC9F2; --bright-dim:#58A6D6; --signal-dim:#8699AA; --flag:#C9A97E; --alert:#C98A8F;
+  --grow:#C3D6E4; --slow:#7D90A6; --rest:#8E86A6; --dead:#4A5668;
+  --mountain-back:#15223A; --mountain-front:#1C2C44; --mountain-snow:#CEDAE4; --mountain-snow-secondary:#A3B3C2; --mountain-fog:#0A1322;
+  --mountain-rock:#2B3A52; --mountain-haze:#223247; --mountain-height:240px;
+  --logo-body:#8878B4; --logo-ring:#7FC9F2; --logo-cut:#D8D4E2; --logo-face:#141B28;
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --sans:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 84px);scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--void);color:var(--ice);font-family:var(--sans);font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+h1,h2,h3{font-family:var(--display);line-height:1.05;margin:0;letter-spacing:-.02em;font-weight:700}
+p{margin:0 0 1em;max-width:66ch}
+:focus-visible{outline:2px solid var(--bright);outline-offset:3px;border-radius:3px}
+.wrap{max-width:1440px;margin:0 auto;padding:0 clamp(18px,3.4vw,44px)}
+.m{font-family:var(--mono);font-size:12.5px;letter-spacing:.06em;color:var(--mist)}
+.ref{font-family:var(--mono);font-size:12px;color:var(--signal-dim)}
+.mute{color:var(--mist)}
+/* nav */
+header.bar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--void) 86%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--edge);padding-top:env(safe-area-inset-top,0px)}
+.bar-in{display:flex;align-items:center;gap:20px;height:68px}
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none;font-family:var(--display);font-weight:700;font-size:21px;letter-spacing:.01em}
+.logo svg{width:28px;height:28px;flex:none}
+nav.tabs{display:flex;gap:4px;margin-left:auto}
+nav.tabs a{text-decoration:none;font-size:15px;padding:9px 16px;border-radius:2px;color:var(--mist);border:1px solid transparent}
+nav.tabs a:hover{color:var(--ice)}
+nav.tabs a[aria-current="page"]{color:#0A1322;background:var(--bright);font-weight:600}
+main>section.page{display:none}
+main>section.page.on{display:block}
+.block{padding:104px 0;border-top:1px solid var(--edge)}
+h2.sec{max-width:17ch}
+h2.sec+.lede{margin-top:18px}
+.btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.btn{display:inline-block;text-decoration:none;font-weight:600;font-size:15.5px;padding:14px 24px;border-radius:2px;border:1px solid var(--signal);color:var(--signal)}
+.btn.primary{background:var(--bright);color:#0A1322;border-color:var(--bright)}
+.btn:hover{background:var(--signal);color:#101827}
+/* hero */
+.hero{position:relative;min-height:min(62vh,560px);display:flex;align-items:center;overflow:hidden}
+.hero-grid{display:block;width:100%;padding-top:72px;padding-bottom:84px;position:relative;z-index:2}
+.hero h1{max-width:15ch}
+.hero .lede{margin-top:26px}
+.orbio-mountains{position:relative;width:100%;height:var(--mountain-height);overflow:hidden;background:transparent;margin-top:-1px}
+.orbio-mountains__canvas{width:100%;height:100%;display:block}
 
-    <main id="main">
-      <section class="hero model-hero" aria-labelledby="hero-title">
-        <div class="hero-copy" data-reveal>
-          <p class="eyebrow">Organoid Response and Biology in Orbit</p>
-          <h1 id="hero-title">ORBIO</h1>
-          <p class="hero-line">A virtual organoid for biology in orbit.</p>
-          <p class="hero-subline">
-            Explore thousands of biological conditions in software, then decide
-            what is worth testing in flight.
-          </p>
-          <p class="system-line">Physics-informed simulation / AI representation / real-data calibration</p>
-          <div class="hero-actions">
-            <a class="button primary" href="#how">Explore the model</a>
-            <a class="button secondary" href="explore/">See the results</a>
-          </div>
-        </div>
-        <figure class="hero-media" data-reveal>
-          <video
-            data-hero-video
-            autoplay
-            muted
-            loop
-            playsinline
-            preload="metadata"
-            poster="/public/media/orbio_day1_day7_poster.png"
-            aria-label="Simulator-rendered organoid growth from day 1 to day 7"
-          >
-            <source src="public/media/orbio_day1_day7.webm" type="video/webm">
-            <source src="public/media/orbio_day1_day7.mp4" type="video/mp4">
-          </video>
-          <figcaption>
-            <span>DAY 1</span>
-            <span class="day-line"></span>
-            <span>DAY 7</span>
-          </figcaption>
-        </figure>
-      </section>
+footer{border-top:0;padding:10px 0 56px;font-size:14px;color:var(--mist)}
 
-      <section class="section split-problem" aria-labelledby="problem-title">
-        <div class="section-kicker">Why the problem exists</div>
-        <h2 id="problem-title">We can fly biology. We cannot observe every possibility.</h2>
-        <div class="environment-map" aria-label="Ground, RPM and real flight comparison">
-          <article class="env-stage" tabindex="0" data-env="ground">
-            <svg viewBox="0 0 320 260" role="img" aria-label="Ground 1g organoid transport diagram">
-              <defs>
-                <linearGradient id="groundO2" x1="0" x2="0" y1="0" y2="1">
-                  <stop offset="0" stop-color="#d7f3f0"/>
-                  <stop offset="1" stop-color="#f7f4ee"/>
-                </linearGradient>
-              </defs>
-              <rect x="8" y="8" width="304" height="244" rx="0" fill="url(#groundO2)" stroke="#16324a" opacity=".86"/>
-              <path d="M56 46 v96" stroke="#17324a" stroke-width="4"/>
-              <path d="M42 126 l14 22 14-22" fill="none" stroke="#17324a" stroke-width="4"/>
-              <ellipse cx="170" cy="186" rx="74" ry="34" fill="#0f79c8" opacity=".22"/>
-              <g fill="none" stroke="#19a28b" stroke-width="2" opacity=".8">
-                <path d="M92 112 C126 88 168 88 202 112"/>
-                <path d="M222 118 C248 146 248 174 222 202"/>
-                <path d="M112 202 C84 176 84 146 112 120"/>
-              </g>
-              <path d="M66 218 H268" stroke="#d59a31" stroke-width="8" opacity=".32"/>
-            </svg>
-            <h3>GROUND</h3>
-            <p>Sedimentation, convection and a thinner depleted layer.</p>
-          </article>
-          <article class="env-stage" tabindex="0" data-env="rpm">
-            <svg viewBox="0 0 320 260" role="img" aria-label="RPM analogue diagram">
-              <rect x="8" y="8" width="304" height="244" fill="#f7f4ee" stroke="#16324a" opacity=".86"/>
-              <circle cx="160" cy="130" r="78" fill="none" stroke="#0f79c8" stroke-width="2" stroke-dasharray="5 8"/>
-              <path d="M160 52 a78 78 0 0 1 73 50" fill="none" stroke="#0f79c8" stroke-width="5"/>
-              <path d="M235 86 l7 25-25-5" fill="none" stroke="#0f79c8" stroke-width="4"/>
-              <ellipse cx="160" cy="134" rx="56" ry="42" fill="#19a28b" opacity=".22"/>
-              <g stroke="#d59a31" stroke-width="2" opacity=".65">
-                <path d="M72 88 C122 120 206 78 250 116"/>
-                <path d="M68 160 C126 128 204 178 252 140"/>
-                <path d="M102 210 C146 184 198 214 238 192"/>
-              </g>
-            </svg>
-            <h3>RPM / CLINOSTAT</h3>
-            <p>Fast analogues. Mixing and shear are visible covariates.</p>
-          </article>
-          <article class="env-stage" tabindex="0" data-env="flight">
-            <svg viewBox="0 0 320 260" role="img" aria-label="Real flight microgravity diagram">
-              <rect x="8" y="8" width="304" height="244" fill="#fbfaf6" stroke="#16324a" opacity=".86"/>
-              <ellipse cx="158" cy="128" rx="62" ry="48" fill="#0f79c8" opacity=".19"/>
-              <ellipse cx="158" cy="128" rx="104" ry="84" fill="none" stroke="#d59a31" stroke-width="12" opacity=".16"/>
-              <g fill="#19a28b" opacity=".65">
-                <circle cx="76" cy="74" r="3"/>
-                <circle cx="248" cy="86" r="2.5"/>
-                <circle cx="232" cy="188" r="3"/>
-                <circle cx="92" cy="190" r="2.5"/>
-              </g>
-              <path d="M94 82 l18 8 -18 8 18 8" fill="none" stroke="#d36d5d" stroke-width="2" opacity=".75"/>
-              <path d="M228 62 l18 8 -18 8 18 8" fill="none" stroke="#d36d5d" stroke-width="2" opacity=".75"/>
-              <path d="M118 224 C148 204 176 244 210 220" fill="none" stroke="#17324a" stroke-width="2" stroke-dasharray="4 6"/>
-            </svg>
-            <h3>REAL FLIGHT</h3>
-            <p>Target condition. Sparse, scarce and not interchangeable with analogues.</p>
-          </article>
-        </div>
-      </section>
+.logo svg{width:34px;height:34px;flex:none}
+.logo .wm{display:flex;flex-direction:column;line-height:1}
+.logo .wm b{font-family:var(--display);font-weight:700;font-size:21px;letter-spacing:.04em}
+.logo .wm small{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;color:var(--bright);margin-top:3px}
+.lockup{display:flex;align-items:center;gap:22px;margin-bottom:26px}
+.lockup svg{width:72px;height:72px;flex:none}
+.lockup b{font-family:var(--display);font-size:34px;letter-spacing:.04em;display:block;line-height:1}
+.lockup small{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--bright)}
+@media (max-width:560px){.lockup .pmark{width:62px;height:62px}}
 
-      <section class="section data-gap" aria-labelledby="gap-title">
-        <div>
-          <div class="section-kicker">The data gap</div>
-          <h2 id="gap-title">What happens between measurements?</h2>
-          <p>
-            Many high-information assays are destructive. Flight observations are
-            sparse. ORBIO connects those observations computationally while
-            keeping uncertainty visible.
-          </p>
-        </div>
-        <svg class="trajectory-visual" viewBox="0 0 920 320" role="img" aria-label="Sparse measurements and reconstructed latent trajectory">
-          <path class="unknown-band" d="M94 178 C258 80 410 246 566 124 S786 86 850 174 L850 234 C720 154 612 216 480 206 S238 214 94 256 Z"/>
-          <path class="latent-line" d="M94 214 C252 116 400 256 566 146 S784 106 850 186"/>
-          <g class="measurements">
-            <circle cx="94" cy="214" r="12"/>
-            <circle cx="468" cy="202" r="12"/>
-            <circle cx="850" cy="186" r="12"/>
-          </g>
-          <g class="axis-labels">
-            <text x="70" y="286">DAY 0</text>
-            <text x="438" y="286">DAY 3</text>
-            <text x="816" y="286">DAY 7</text>
-          </g>
-        </svg>
-      </section>
+/* one-time hero entrance: the mark drops in, then the words arrive */
+.lockup{position:relative}
+.lockup .pmark{transform-origin:50% 86%}
+.lockup .impact{position:absolute;left:0;bottom:-6px;width:72px;height:2px;background:var(--bright);opacity:0;transform:scaleX(.2);border-radius:2px}
+.play-intro .lockup .pmark{animation:orb-drop 980ms cubic-bezier(.3,.85,.35,1) both}
+.play-intro .lockup .impact{animation:orb-impact 620ms ease-out 820ms both}
+.play-intro .reveal{opacity:0;animation:orb-rise 620ms cubic-bezier(.2,.7,.3,1) both}
+.play-intro .r1{animation-delay:860ms}
+.play-intro .r2{animation-delay:980ms}
+.play-intro .r3{animation-delay:1200ms}
+.play-intro .r4{animation-delay:1360ms}
+@keyframes orb-drop{
+  0%{transform:translateY(-52vh) rotate(-26deg) scale(1.12);opacity:0}
+  28%{opacity:1}
+  62%{transform:translateY(0) rotate(0deg) scale(1)}
+  72%{transform:translateY(0) scaleX(1.16) scaleY(.84)}
+  82%{transform:translateY(-13px) scaleX(.96) scaleY(1.05)}
+  92%{transform:translateY(0) scaleX(1.05) scaleY(.96)}
+  100%{transform:translateY(0) scale(1)}}
+@keyframes orb-impact{0%{opacity:.9;transform:scaleX(.2)}60%{opacity:.45}100%{opacity:0;transform:scaleX(1.5)}}
+@keyframes orb-rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes orb-fade{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .play-intro .lockup .pmark,
+  .play-intro .lockup .impact,
+  .play-intro .reveal{animation:none;opacity:1;transform:none}
+}
 
-      <section class="section how" id="how" aria-labelledby="how-title">
-        <div class="section-kicker">How ORBIO works</div>
-        <h2 id="how-title">One experiment becomes a virtual organoid, then a forecast.</h2>
-        <div class="pipeline-stage" data-pipeline>
-          <div class="pipeline-copy">
-            <ol>
-              <li data-step="0">Experiment: gravity, tissue, morphology, drug, dose, schedule, hardware.</li>
-              <li data-step="1">Virtual organoid: cells, O2, glucose, drug and mechanics evolve together.</li>
-              <li data-step="2">Cell graph: individual cells become nearby graph nodes.</li>
-              <li data-step="3">Organoid state: the graph compresses into a latent representation.</li>
-              <li data-step="4">Future prediction: day-1 state plus condition points to day-7 phenotype.</li>
-            </ol>
-            <p class="mini-equation">G_day1 -> z1 -> z7 -> phenotype</p>
-          </div>
-          <svg class="pipeline-visual" viewBox="0 0 880 520" role="img" aria-label="ORBIO pipeline transformation">
-            <g class="experiment-controls">
-              <rect x="52" y="78" width="176" height="322"/>
-              <text x="86" y="120">EXPERIMENT</text>
-              <path d="M84 158 H194 M84 198 H176 M84 238 H208 M84 278 H164 M84 318 H188 M84 358 H150" />
-            </g>
-            <g class="organoid-cloud">
-              <circle cx="382" cy="242" r="86"/>
-              <circle cx="342" cy="214" r="18"/>
-              <circle cx="392" cy="196" r="15"/>
-              <circle cx="430" cy="244" r="20"/>
-              <circle cx="358" cy="278" r="17"/>
-              <circle cx="400" cy="300" r="14"/>
-              <path d="M292 330 C340 286 420 364 474 318"/>
-            </g>
-            <g class="graph-nodes">
-              <path d="M572 188 L630 220 L604 290 L524 282 L500 220 Z"/>
-              <circle cx="572" cy="188" r="12"/>
-              <circle cx="630" cy="220" r="12"/>
-              <circle cx="604" cy="290" r="12"/>
-              <circle cx="524" cy="282" r="12"/>
-              <circle cx="500" cy="220" r="12"/>
-            </g>
-            <g class="latent-orbit">
-              <ellipse cx="728" cy="244" rx="88" ry="38"/>
-              <ellipse cx="728" cy="244" rx="58" ry="92"/>
-              <circle cx="748" cy="206" r="10"/>
-              <path d="M692 336 C732 284 774 286 808 330"/>
-            </g>
-            <g class="flow-lines">
-              <path d="M230 242 C260 238 276 238 300 242"/>
-              <path d="M472 242 C496 226 510 218 536 208"/>
-              <path d="M642 252 C672 252 678 252 696 252"/>
-            </g>
-          </svg>
-        </div>
-      </section>
+/* the interactive experiment, embedded from its own page */
+.xp{border-top:1px solid var(--edge);padding:64px 0 0}
+.xp-head{margin-bottom:26px}
+.xp-head h2{max-width:18ch;margin-top:6px}
+.xp-head p{margin:12px 0 0;max-width:62ch}
+.xp-frame{position:relative;border-top:1px solid var(--edge);border-bottom:1px solid var(--edge);background:var(--deep)}
+.xp-frame iframe{display:block;width:100%;height:1600px;border:0;background:transparent;color-scheme:dark}
+.xp-note{padding:14px clamp(18px,3.4vw,44px) 64px;max-width:none;margin:0}
+@media (max-width:820px){.xp-frame iframe{height:1280px}}
 
-      <section class="section physics" aria-labelledby="physics-title">
-        <div>
-          <div class="section-kicker">Where physics enters</div>
-          <h2 id="physics-title">Transport changes before biology answers.</h2>
-          <p>
-            The current simulator represents reaction-diffusion, sedimentation,
-            finite medium and radiation. G-jitter and vibration-induced mixing
-            are marked as next work, not current capability.
-          </p>
-          <div class="segmented" role="group" aria-label="Toggle transport condition">
-            <button class="active" type="button" data-physics-mode="one-g">1g</button>
-            <button type="button" data-physics-mode="micro-g">microgravity</button>
-          </div>
-        </div>
-        <div class="transport-visual one-g" data-transport>
-          <svg viewBox="0 0 740 460" role="img" aria-label="Transport cross-section with O2, glucose and drug">
-            <defs>
-              <radialGradient id="o2Field" cx="50%" cy="46%" r="58%">
-                <stop offset="0" stop-color="#d59a31" stop-opacity=".28"/>
-                <stop offset=".54" stop-color="#80d4d0" stop-opacity=".28"/>
-                <stop offset="1" stop-color="#f7f4ee" stop-opacity="0"/>
-              </radialGradient>
-            </defs>
-            <rect x="0" y="0" width="740" height="460" fill="#fbfaf6"/>
-            <rect class="substrate" x="64" y="358" width="612" height="26"/>
-            <ellipse class="boundary" cx="366" cy="246" rx="220" ry="142"/>
-            <circle class="organoid-core" cx="366" cy="246" r="92"/>
-            <circle cx="366" cy="246" r="174" fill="url(#o2Field)"/>
-            <g class="particles">
-              <circle cx="166" cy="116" r="5"/><circle cx="238" cy="92" r="3"/><circle cx="580" cy="128" r="5"/>
-              <circle cx="616" cy="288" r="4"/><circle cx="118" cy="284" r="4"/><circle cx="512" cy="90" r="3"/>
-            </g>
-            <g class="transport-arrows">
-              <path d="M146 210 C218 164 274 170 322 200"/>
-              <path d="M592 220 C522 168 468 174 420 206"/>
-              <path d="M366 78 v86"/>
-            </g>
-            <text x="84" y="82">O2 / glucose / drug</text>
-            <text class="mode-label" x="84" y="418">1g: settled organoid, thinner boundary layer, convection present</text>
-          </svg>
-        </div>
-      </section>
+/* small screens: single column, roomier tap targets, no sideways scroll */
+@media (max-width:760px){
+  body{font-size:16px}
+  .bar-in{height:60px;gap:12px}
+  .logo svg{width:30px;height:30px}
+  nav.tabs{gap:2px}
+  nav.tabs a{padding:8px 11px;font-size:14px}
+  .block{padding:64px 0}
+  .hero{min-height:auto}
+  .facts,            .xp-head h2{max-width:none}
+}
+@media (max-width:420px){
+  .wrap{padding:0 16px}
+  .logo .wm small{display:none}
+}
 
-      <section class="section data-model" aria-labelledby="data-model-title">
-        <div class="section-kicker">From real data to model priors</div>
-        <h2 id="data-model-title">Data can set direction. The magnitude still has assumptions.</h2>
-        <div class="flow-strip" aria-label="NASA omics data to ORBIO model prior flow">
-          <span>NASA / public flight data</span>
-          <span>transcriptomics</span>
-          <span>gene programs</span>
-          <span>microgravity effect</span>
-          <span>model prior</span>
-          <span>ORBIO</span>
-        </div>
-        <p class="numeric-example">
-          Neural proliferation program:
-          <strong data-neural-delta>Delta score -0.62</strong>
-          mapped to proliferation multiplier
-          <strong data-neural-multiplier>0.911</strong>.
-        </p>
-        <p class="caveat">Direction supported by data; mapping magnitude remains model-dependent.</p>
-      </section>
+/* brand mark: the rendered tuber with its orbit */
+.pmark{position:relative;display:inline-block;width:38px;height:38px;flex:none}
+.pmark-disc{position:absolute;inset:0;border-radius:50%;background:#FFFFFF}
+.pmark img{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);height:84%;width:auto;filter:drop-shadow(0 3px 6px rgba(0,0,0,.5));animation:lg-breathe 5.4s ease-in-out infinite}
+.logo .pmark{width:40px;height:40px}
+.lockup .pmark{width:92px;height:92px}
+@keyframes lg-breathe{0%,100%{transform:translate(-50%,-50%) rotate(-1.6deg) scale(1)}46%{transform:translate(-50%,-54%) rotate(1.8deg) scale(1.03)}}
+.logo:hover .pmark img,.lockup:hover .pmark img{animation-duration:2.1s}
+@media (prefers-reduced-motion:reduce){.pmark img{animation:none}}
 
-      <section class="section funnel" aria-labelledby="funnel-title">
-        <div class="section-kicker">From possibilities to flight</div>
-        <h2 id="funnel-title">Thousands of virtual conditions should become a smaller, better flight question.</h2>
-        <div class="funnel-visual" data-funnel aria-label="Virtual scenario funnel">
-          <div class="scenario-dots" data-funnel-dots></div>
-          <div class="funnel-neck"></div>
-          <div class="flight-window">flight opportunity</div>
-        </div>
-        <p>
-          The scarce resource is not rocket mass alone. It is iteration time and
-          high-quality biological information.
-        </p>
-      </section>
+.flow-fig{margin:40px 0 0}
+.flow-fig img{display:block;width:100%;height:auto;border:1px solid var(--edge);border-radius:4px;background:var(--deep)}
+.flow-fig figcaption{margin-top:14px;max-width:none}
 
-      <section class="section closed-loop" aria-labelledby="loop-title">
-        <div>
-          <div class="section-kicker">Closed loop</div>
-          <h2 id="loop-title">Every experiment should make the next model less wrong.</h2>
-        </div>
-        <svg class="loop-visual" viewBox="0 0 720 520" role="img" aria-label="ORBIO closed-loop diagram">
-          <circle cx="360" cy="260" r="170" fill="none" stroke="#16324a" stroke-width="1.4" stroke-dasharray="4 10"/>
-          <g class="loop-items">
-            <text x="298" y="76">GROUND DATA</text>
-            <text x="538" y="168">ORBIO</text>
-            <text x="492" y="384">VIRTUAL EXPERIMENTS</text>
-            <text x="238" y="468">SELECT FLIGHT</text>
-            <text x="72" y="338">REAL FLIGHT</text>
-            <text x="88" y="172">NEW DATA</text>
-          </g>
-          <path class="orbiting-line" d="M360 90 C552 92 610 304 478 424 C316 552 94 412 126 224 C154 62 306 58 360 90"/>
-          <circle class="orbiting-dot" cx="360" cy="90" r="8"/>
-          <text x="310" y="266" class="center-label">RPM / imaging / omics / medium telemetry</text>
-        </svg>
-      </section>
+/* the mascot and why it is a sweet potato */
+.story{display:grid;grid-template-columns:200px 1fr;gap:40px;align-items:center;margin-top:56px;border-top:1px solid var(--edge);padding-top:48px}
+.story-art{position:relative;width:200px;height:200px}
+.story-art .disc{position:absolute;inset:0;border-radius:50%;background:#FFFFFF}
+.story-art img{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);height:84%;width:auto;filter:drop-shadow(0 10px 18px rgba(0,0,0,.45));animation:lg-breathe 5.4s ease-in-out infinite}
+.story h3{margin-bottom:12px}
+.story p{margin:0 0 .9em;max-width:62ch}
+.story p:last-child{margin-bottom:0}
+@media (max-width:760px){.story{grid-template-columns:1fr;gap:26px}.story-art{width:150px;height:150px}}
 
-      <section class="section is-not" aria-labelledby="truth-title">
-        <h2 id="truth-title">What ORBIO is, and what it is not.</h2>
-        <div class="contrast-columns">
-          <div>
-            <h3>ORBIO is</h3>
-            <p>a research prototype</p>
-            <p>a multiscale virtual experiment engine</p>
-            <p>uncertainty-aware</p>
-            <p>a bridge between analogues and real flight</p>
-          </div>
-          <div>
-            <h3>ORBIO is not</h3>
-            <p>a replacement for flight experiments</p>
-            <p>a clinically validated predictor</p>
-            <p>a complete first-principles model</p>
-            <p>proof that a drug will behave a certain way in orbit</p>
-          </div>
-        </div>
-      </section>
+/* type scale: one ladder for every page
+   L1 page title · L2 section heading · L3 sub-heading · lede · body · caption · eyebrow */
+.hero h1,.t1{font-size:clamp(42px,6.6vw,84px);line-height:1.04;letter-spacing:-.022em}
+h2.sec,.t2{font-size:clamp(32px,4.4vw,56px);line-height:1.08;letter-spacing:-.018em}
+.xp-head h2,.story h3,.t3{font-size:clamp(24px,2.6vw,34px);line-height:1.15;letter-spacing:-.012em}
+.lede{font-size:clamp(18px,1.5vw,21px);line-height:1.55;color:var(--mist);max-width:58ch}
+.xp-head p,.story p{font-size:17px;line-height:1.6;color:var(--mist)}
+.flow-fig figcaption,.xp-note{font-size:14px;line-height:1.55;color:var(--mist)}
+.m{font-family:var(--mono);font-size:12.5px;letter-spacing:.1em;color:var(--mist)}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap bar-in">
+  <a class="logo" href="#project" aria-label="ORBIO home"><span class="pmark" aria-hidden="true"><span class="pmark-disc"></span><img src="./assets/mascot.webp" alt=""></span><span class="wm"><b>ORBIO</b><small>VIRTUAL ORGANOID</small></span></a>
+  <nav class="tabs" aria-label="Pages">
+    <a href="#project" data-page="project" aria-current="page">Project</a>
+    <a href="#technology" data-page="technology">Technology</a>
+    <a href="#team" data-page="team">Team</a>
+  </nav>
+</div></header>
 
-      <section class="section final-cta" aria-labelledby="break-title">
-        <h2 id="break-title">We built the model. Now break it.</h2>
-        <a class="button primary" href="explore/">Explore the results</a>
-      </section>
-    </main>
-  </body>
+<main>
+<!-- ============ PAGE 1 ============ -->
+<section class="page on" id="page-project" aria-label="Project">
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="lockup"><span class="pmark" aria-hidden="true"><span class="pmark-disc"></span><img src="./assets/mascot.webp" alt=""></span><span class="reveal r1"><b>ORBIO</b><small>A VIRTUAL ORGANOID FOR MICROGRAVITY</small></span><span class="impact" aria-hidden="true"></span></div>
+        <h1 class="reveal r2">Rehearse the experiment before you fly it.</h1>
+        <p class="lede reveal r3">Flights to orbit are rare, costly and small. ORBIO simulates how a 3D mini-tissue grows and responds to drugs in microgravity, so you can compare designs on the ground, pick the ones worth flying, and keep watch once they are up there.</p>
+        <div class="btns reveal r4"><a class="btn primary" href="#experiment">Try the simulation</a><a class="btn" href="#technology">How it works</a></div>
+      </div>
+    </div>
+  </div>
+
+  </section>
+
+<!-- ============ PAGE 2 ============ -->
+<section class="page" id="page-technology" aria-label="Technology">
+  <div class="block" style="border-top:0;padding-top:72px"><div class="wrap">
+    <h2 class="sec" style="max-width:none">How it works</h2>
+    <figure class="flow-fig" style="margin-top:28px">
+      <img src="./assets/flowchart.png" alt="ORBIO pipeline: inputs (experiment plan, literature priors, transcriptomics, proteomics, in-flight measurements) feed five steps (simulate, snapshot at 24 h, learn a cell-graph representation, predict with a deep ensemble, test on unseen conditions) and produce growth class, growth size, cell fates, uncertainty and a digital twin forecast.">
+      <figcaption>Simulator outcomes only, no wet-lab validation. AUC 0.88 is the growth-class AUC with flight microgravity held out of training; accuracy on that test is 0.83, the same as always predicting “grows”.</figcaption>
+    </figure>
+  </div></div>
+  <div class="xp" id="experiment">
+    <div class="wrap xp-head">
+      <p class="m">INTERACTIVE</p>
+      <h2>Run a virtual experiment now.</h2>
+      <p>Pick a gravity condition, a tissue and a morphology, then watch the organoid develop from day 0 to day 7 — you will see the cell states and how it grows.</p>
+    </div>
+    <div class="xp-frame"><iframe src="experiment/" title="ORBIO virtual experiment" loading="lazy"></iframe></div>
+    <p class="xp-note">Illustrative demo. The trajectories come from a browser-side surrogate of the ORBIO simulator, not from a live run of the full model.</p>
+  </div>
+
+</section>
+
+<!-- ============ PAGE 3 ============ -->
+<section class="page" id="page-team" aria-label="Team">
+  <div class="block" style="border-top:0;padding-top:76px"><div class="wrap">
+    <p class="m">WHAT WE BUILD</p>
+    <h2 class="sec" style="max-width:15ch;margin-top:14px">Software that predicts your experiment in orbit.</h2>
+    <p class="lede" style="margin-top:22px">Decide earlier. Move faster.</p>
+    <div class="story">
+      <div class="story-art" aria-hidden="true"><span class="disc"></span><img src="./assets/mascot.webp" alt=""></div>
+      <div>
+        <h3>Why a sweet potato</h3>
+        <p>It grows underground, where nobody can watch it. You tend it, you wait, and you only find out what happened when you dig it up.</p>
+        <p>That is still what flying biology to orbit feels like. You seal the hardware, it leaves, and months later you open it and read the result. ORBIO exists to shorten that blind stretch: to know a little more about what is happening before the digging.</p>
+      </div>
+    </div>
+
+  </div></div>
+</section>
+</main>
+<div class="orbio-mountains" data-orbio-mountains aria-hidden="true"><canvas class="orbio-mountains__canvas"></canvas></div>
+<footer><div class="wrap">ORBIO is a research prototype. Simulator outcomes only, with no wet-lab validation yet.</div></footer>
+<script>
+// ---------- routing ----------
+const PAGES=["project","technology","team"];
+function route(){
+  const h=(location.hash||"#project").slice(1); let page=h,anchor=null;
+  if(!PAGES.includes(h)){const el=document.getElementById(h),p=el&&el.closest("section.page");if(p){page=p.id.replace("page-","");anchor=el}else page="project"}
+  PAGES.forEach(p=>document.getElementById("page-"+p).classList.toggle("on",p===page));
+  document.querySelectorAll("nav.tabs a").forEach(a=>{a.dataset.page===page?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current")});
+  requestAnimationFrame(()=>{anchor?anchor.scrollIntoView():window.scrollTo(0,0)});
+}
+addEventListener("hashchange",route);
+
+const REDUCE=matchMedia("(prefers-reduced-motion: reduce)");
+// the embedded experiment reports its height; the page keeps the only scrollbar
+addEventListener("message",e=>{
+  if(!e.data||e.data.type!=="orbio:height")return;
+  const f=document.querySelector(".xp-frame iframe");
+  if(f&&e.source===f.contentWindow)f.style.height=Math.max(600,e.data.height)+"px";
+});
+
+// ---------- hero entrance, once per visit ----------
+(()=>{let played=false;
+ try{played=sessionStorage.getItem('orbio-intro')==='1'}catch(e){}
+ function play(){ if(played)return; if(!document.getElementById('page-project').classList.contains('on'))return;
+   played=true; try{sessionStorage.setItem('orbio-intro','1')}catch(e){}
+   document.body.classList.add('play-intro');
+   setTimeout(()=>document.body.classList.remove('play-intro'),2600);}
+ addEventListener('hashchange',play); play();})();
+// ---------- mountains ----------
+(()=>{document.querySelectorAll('[data-orbio-mountains]').forEach(root=>{if(root.dataset.initialized)return;root.dataset.initialized='true';
+const canvas=root.querySelector('canvas'),ctx=canvas.getContext('2d');if(!ctx)return;
+const RAND=(i)=>{const x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x)};
+const RIDGES=[
+ {pts:[[0,.80],[.06,.62],[.13,.70],[.21,.44],[.28,.66],[.36,.38],[.44,.62],[.53,.48],[.61,.70],[.72,.34],[.83,.64],[.93,.47],[1,.74]],k:'--mountain-back',snow:.50,shade:.22},
+ {pts:[[0,.95],[.09,.78],[.18,.83],[.31,.24],[.40,.68],[.47,.57],[.57,.88],[.66,.62],[.73,.76],[.85,.42],[.95,.78],[1,.72]],k:'--mountain-front',snow:.42,shade:.30}
+];
+function mix(a,b,t){const p=c=>{c=c.replace('#','');return[parseInt(c.slice(0,2),16),parseInt(c.slice(2,4),16),parseInt(c.slice(4,6),16)]};
+ const A=p(a),B=p(b);return`rgb(${A.map((v,i)=>Math.round(v+(B[i]-v)*t)).join(',')})`}
+function draw(){const b=root.getBoundingClientRect(),w=b.width,h=b.height;if(!w||!h)return;
+const d=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(w*d);canvas.height=Math.round(h*d);ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,w,h);
+const cs=getComputedStyle(root),C=n=>cs.getPropertyValue(n).trim();
+const rock=C('--mountain-rock'),haze=C('--mountain-haze'),fog=C('--mountain-fog');
+RIDGES.forEach((R,li)=>{
+  const base=C(R.k), lit=mix(base,rock,.55), snow=li?C('--mountain-snow-secondary'):C('--mountain-snow');
+  // body
+  ctx.beginPath();ctx.moveTo(0,h);R.pts.forEach(p=>ctx.lineTo(p[0]*w,p[1]*h));ctx.lineTo(w,h);ctx.closePath();
+  ctx.fillStyle=base;ctx.fill();
+  // sunlit east faces: triangle on the right side of each peak
+  for(let i=1;i<R.pts.length-1;i++){
+    const a=R.pts[i-1],p=R.pts[i],c=R.pts[i+1];
+    if(p[1]<a[1]&&p[1]<c[1]){
+      ctx.beginPath();ctx.moveTo(p[0]*w,p[1]*h);ctx.lineTo(c[0]*w,c[1]*h);
+      ctx.lineTo(((p[0]+c[0])/2)*w,Math.min(h,((p[1]+c[1])/2+0.10)*h));ctx.closePath();
+      ctx.globalAlpha=R.shade;ctx.fillStyle=lit;ctx.fill();ctx.globalAlpha=1;
+      // snow cap on the peak
+      const sp=R.snow;
+      ctx.beginPath();ctx.moveTo(p[0]*w,p[1]*h);
+      ctx.lineTo((p[0]+(a[0]-p[0])*sp*.55)*w,(p[1]+(a[1]-p[1])*sp*.55)*h);
+      ctx.lineTo((p[0]+(a[0]-p[0])*sp*.3)*w,(p[1]+(a[1]-p[1])*sp*.42+.012)*h);
+      ctx.lineTo((p[0]+(c[0]-p[0])*sp*.34)*w,(p[1]+(c[1]-p[1])*sp*.5+.015)*h);
+      ctx.lineTo((p[0]+(c[0]-p[0])*sp*.62)*w,(p[1]+(c[1]-p[1])*sp*.62)*h);
+      ctx.closePath();ctx.fillStyle=snow;ctx.globalAlpha=li?.75:.9;ctx.fill();ctx.globalAlpha=1;
+    }
+  }
+  // grain over this ridge only
+  ctx.save();ctx.beginPath();ctx.moveTo(0,h);R.pts.forEach(p=>ctx.lineTo(p[0]*w,p[1]*h));ctx.lineTo(w,h);ctx.closePath();ctx.clip();
+  ctx.globalAlpha=.055;ctx.fillStyle=rock;
+  for(let i=0;i<220;i++){const x=RAND(i+li*500)*w,y=(0.2+RAND(i+li*500+77)*0.8)*h,r=0.6+RAND(i+li*500+9)*1.5;
+    ctx.beginPath();ctx.arc(x,y,r,0,6.3);ctx.fill()}
+  ctx.globalAlpha=1;ctx.restore();
+  // haze band in front of the back ridge
+  if(li===0){const g=ctx.createLinearGradient(0,h*.45,0,h*.92);g.addColorStop(0,'transparent');g.addColorStop(1,haze);
+    ctx.globalAlpha=.30;ctx.fillStyle=g;ctx.fillRect(0,0,w,h);ctx.globalAlpha=1}
+});
+const g=ctx.createLinearGradient(0,h*.30,0,h);g.addColorStop(0,'transparent');g.addColorStop(.78,fog+'bb');g.addColorStop(1,fog);
+ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+const t=ctx.createLinearGradient(0,0,0,h*.34);t.addColorStop(0,fog);t.addColorStop(1,'transparent');
+ctx.fillStyle=t;ctx.fillRect(0,0,w,h*.34)}
+new ResizeObserver(draw).observe(root);draw()})})();
+// ---------- mascot ----------
+</script>
+</body>
 </html>

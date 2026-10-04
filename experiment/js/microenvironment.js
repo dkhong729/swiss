@@ -135,5 +135,5 @@ function renderRadialProfile(state, activeFields) {
     : "";
   document.querySelector("#profile-lumen-note").textContent =
     `Solid line: O₂ · dashed line: glucose. ${note}ΔO₂ bulk→surface ${(transport.deltaO2 * 100).toFixed(1)}% · δ/R ${transport.transportBarrierRatio.toFixed(2)} · ΦO₂ ${transport.phiO2.toFixed(2)}`;
-  svg.querySelector("#core-indicator")?.setAttribute("fill", mixHex("#d36d5d", "#0f79c8", transport.coreO2));
+  svg.querySelector("#core-indicator")?.setAttribute("fill", mixHex("#C98A8F", "#7FC9F2", transport.coreO2));
 }

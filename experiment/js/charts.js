@@ -2,11 +2,11 @@
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 const GRAVITY_COLORS = {
-  ground_1g: "#102235",
-  flight_ug: "#0f79c8",
-  flight_1g_ctrl: "#7b6b62",
-  sim_ug_rpm: "#d59a31",
-  sim_ug_clinostat: "#19a28b"
+  ground_1g: "#E3EBF2",
+  flight_ug: "#5CC8F5",
+  flight_1g_ctrl: "#A98BE0",
+  sim_ug_rpm: "#E0A96B",
+  sim_ug_clinostat: "#59C9A8"
 };
 const PROGRAM_LABELS = {
   proliferation: "Proliferation",
