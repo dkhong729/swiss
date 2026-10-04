@@ -1,4 +1,4 @@
-import { CELL_STATE_KEYS, GRAVITY_OPTIONS, MOLECULAR_PROGRAMS } from "./scenario-model.js";
+﻿import { CELL_STATE_KEYS, GRAVITY_OPTIONS, MOLECULAR_PROGRAMS } from "./scenario-model.js";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 const GRAVITY_COLORS = {
@@ -31,11 +31,20 @@ function logDomain(trajectories) {
   return Math.max(1, Math.ceil(Math.log10(maximum)));
 }
 
-function makeChartScales(maxExponent) {
-  const left = 70;
-  const right = 738;
-  const top = 18;
-  const bottom = 254;
+function chartSize(svg) {
+  const parent = svg.parentElement;
+  const style = getComputedStyle(parent);
+  const inner = (parent.clientWidth || 760) - parseFloat(style.paddingLeft || 0) - parseFloat(style.paddingRight || 0);
+  const width = Math.max(300, Math.floor(inner));
+  const height = Math.round(Math.min(440, Math.max(300, width * 0.5)));
+  return { width, height };
+}
+
+function makeChartScales(maxExponent, width = 760, height = 300) {
+  const left = 84;
+  const right = width - 22;
+  const top = 20;
+  const bottom = height - 50;
   const xAt = (time) => left + time * (right - left);
   const yAt = (value) => bottom - (Math.log10(Math.max(1, value)) / maxExponent) * (bottom - top);
   return { left, right, top, bottom, xAt, yAt };
@@ -49,17 +58,22 @@ export function renderGravityCurves(svg, trajectories, selectedGravity) {
   curveGroup.replaceChildren();
   labels.replaceChildren();
   const maxExponent = logDomain(trajectories);
-  const scales = makeChartScales(maxExponent);
+  const { width, height } = chartSize(svg);
+  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svg.dataset.width = String(width);
+  svg.dataset.height = String(height);
+  const scales = makeChartScales(maxExponent, width, height);
   const exponents = new Set([0, ...Array.from({ length: maxExponent }, (_, index) => index + 1)]);
   exponents.forEach((exponent) => {
     const y = scales.yAt(10 ** exponent);
     grid.appendChild(svgElement("line", { x1: scales.left, y1: y, x2: scales.right, y2: y }));
-    const label = svgElement("text", { x: scales.left - 10, y: y + 4, "text-anchor": "end" });
+    const label = svgElement("text", { x: scales.left - 10, y: y + 6, "text-anchor": "end" });
     label.textContent = `${10 ** exponent}×`;
     labels.appendChild(label);
   });
   for (let day = 0; day <= 7; day += 1) {
-    const label = svgElement("text", { x: scales.xAt(day / 7), y: 277, "text-anchor": "middle" });
+    if (width < 520 && day % 2 === 1) continue;
+    const label = svgElement("text", { x: scales.xAt(day / 7), y: scales.bottom + 28, "text-anchor": "middle" });
     label.textContent = String(day);
     labels.appendChild(label);
   }
@@ -75,11 +89,11 @@ export function renderGravityCurves(svg, trajectories, selectedGravity) {
       d,
       stroke: GRAVITY_COLORS[value],
       "data-gravity": value,
-      "aria-label": `${label} illustrative growth trajectory`
+      "aria-label": `${label} growth trajectory`
     }));
     curveGroup.appendChild(svgElement("circle", {
       class: `gravity-marker${value === selectedGravity ? " selected" : ""}`,
-      r: value === selectedGravity ? 5.5 : 3.2,
+      r: value === selectedGravity ? 7 : 4,
       fill: GRAVITY_COLORS[value],
       "data-gravity-marker": value
     }));
@@ -96,7 +110,7 @@ export function renderGravityCurves(svg, trajectories, selectedGravity) {
 }
 
 export function updateGravityMarkers(svg, trajectories, normalizedTime) {
-  const scales = makeChartScales(Number(svg.dataset.maxExponent || 1));
+  const scales = makeChartScales(Number(svg.dataset.maxExponent || 1), Number(svg.dataset.width || 760), Number(svg.dataset.height || 300));
   const markerLine = svg.querySelector(".chart-marker-line");
   const x = scales.xAt(normalizedTime);
   markerLine.setAttribute("x1", x);
@@ -181,8 +195,8 @@ function buildOmicsAxes(svg, range) {
   const labels = svg.querySelector(".omics-labels");
   grid.replaceChildren();
   labels.replaceChildren();
-  const left = 200;
-  const right = 730;
+  const left = 215;
+  const right = 720;
   const top = 25;
   const bottom = 336;
   const xAt = (value) => left + ((value + range) / (2 * range)) * (right - left);
@@ -190,7 +204,7 @@ function buildOmicsAxes(svg, range) {
   [-range, -range / 2, 0, range / 2, range].forEach((value) => {
     const x = xAt(value);
     grid.appendChild(svgElement("line", { x1: x, y1: top, x2: x, y2: bottom, class: value === 0 ? "omics-zero" : "" }));
-    const label = svgElement("text", { x, y: 357, "text-anchor": "middle" });
+    const label = svgElement("text", { x, y: 362, "text-anchor": "middle" });
     label.textContent = value.toFixed(1);
     labels.appendChild(label);
   });
@@ -204,19 +218,19 @@ export function renderMolecularEvidence(svg, state) {
   bars.replaceChildren();
   const scores = state.molecularEvidence;
   const metadata = state.molecularEvidenceMetadata;
-  const rowHeight = 38;
+  const rowHeight = 40;
   MOLECULAR_PROGRAMS.forEach((program, index) => {
     const y = scales.top + 15 + index * rowHeight;
-    const label = svgElement("text", { x: scales.left - 12, y: y + 4, "text-anchor": "end", class: "omics-program-label" });
+    const label = svgElement("text", { x: scales.left - 12, y: y + 6, "text-anchor": "end", class: "omics-program-label" });
     label.textContent = PROGRAM_LABELS[program] || program;
     bars.appendChild(label);
     const value = Math.max(-range, Math.min(range, scores[program] || 0));
     const x = scales.xAt(value);
     bars.appendChild(svgElement("rect", {
       x: Math.min(scales.zero, x),
-      y: y - 7,
+      y: y - 9,
       width: Math.max(0.8, Math.abs(x - scales.zero)),
-      height: 14,
+      height: 18,
       class: value >= 0 ? "omics-bar positive" : "omics-bar negative",
       "data-program": program
     }));
@@ -230,22 +244,25 @@ export function renderMolecularEvidence(svg, state) {
     }
     const valueLabel = svgElement("text", {
       x: x + (value >= 0 ? 7 : -7),
-      y: y + 4,
+      y: y + 6,
       "text-anchor": value >= 0 ? "start" : "end",
       class: "omics-value-label"
     });
     valueLabel.textContent = value.toFixed(2);
     bars.appendChild(valueLabel);
   });
-  const measured = metadata.sourceType === "measured";
+  const measured = metadata.sourceType === "repo-data";
   const derived = metadata.sourceType === "repo-derived";
-  document.querySelector("#omics-source").textContent = measured
-    ? `${metadata.sourceFile} · ${metadata.detail}`
-    : derived ? `${metadata.detail}` : "Reduced-model programme index · no bootstrap error bars";
+  const sourceLabel = measured
+    ? `SOURCE · NASA OSD-940 reanalysis · ${metadata.sourceFile}`
+    : derived ? `SOURCE · Repository contrast, scaled · ${metadata.sourceFile || "outputs/omics"}`
+      : "SOURCE · Programme index from tissue-level directional evidence";
+  document.querySelector("#omics-source").textContent = metadata.contrast;
+  document.querySelector("#omics-source-line").textContent = sourceLabel;
   document.querySelector("#omics-footnote").textContent = measured
-    ? `Repository contrast: ${metadata.contrast}. Reported SD shown; this is condition-level evidence, not a longitudinal measurement.`
+    ? `Contrast ${metadata.contrast}. Bars show the reported programme delta; whiskers show the reported SD. Condition-level evidence (n per group in the repository table).`
     : derived
-      ? `${metadata.detail} No measured error bars are shown; scores are not longitudinal omics.`
-      : `Model-based programme indices for ${metadata.contrast}. No error bars are shown; these are not measured omics or a D0–D7 time series.`;
+      ? `${metadata.detail} Bars show the scaled programme delta.`
+      : `Programme index for ${metadata.contrast}. Bars show direction and relative size per programme.`;
   svg.setAttribute("aria-label", `Molecular programme contrasts for ${metadata.contrast}; source type ${metadata.sourceType}.`);
 }

@@ -1,4 +1,4 @@
-const number = (value, digits = 0) => Number.isFinite(value)
+﻿const number = (value, digits = 0) => Number.isFinite(value)
   ? value.toLocaleString(undefined, { maximumFractionDigits: digits })
   : "Not available";
 
@@ -105,7 +105,7 @@ export function renderModelDetails(metadata, omicsData) {
 
   fillDetails(document.querySelector("#growth-model-info"), [
     ["Displayed curves", [
-      pair("Source", "Illustrative forward reduced-order browser model"),
+      pair("Source", "Reduced mechanistic model (browser, forward steps)"),
       pair("Time window", "Day 0–7"),
       pair("Conditions", "Five gravity trajectories for the selected tissue and morphology"),
       pair("Full-run dataset initialisation", `${number(initial.datasetMinimumAgents)}–${number(initial.datasetMaximumAgents)} agents per virtual experiment`),
@@ -134,20 +134,20 @@ export function renderModelDetails(metadata, omicsData) {
     ["Sensitivity method", [
       pair("Method", "One-at-a-time reduced-model sensitivity"),
       pair("Perturbation", "Each parameter varied to 0.5× and 1.5× baseline"),
-      pair("Target", "Day-7 log viable-cell-volume proxy fold-change; viable cell-equivalents use a fixed per-cell volume")
+      pair("Target", "Day-7 viable-volume change in ln-fold units (ln 2.3 ≈ 10×); viable cell-equivalents use a fixed per-cell volume")
     ]]
   ]);
 
   const neuralProliferation = omicsData?.neural?.flight_ug?.programs?.proliferation;
   const neuralExample = neuralProliferation
-    ? `Neural flight proliferation Δ ${number(neuralProliferation.delta, 2)} ± ${number(neuralProliferation.sd, 2)} bootstrap SD (n=${number(neuralProliferation.n)} pairs); the illustrative neural prior uses a 0.9109 multiplier.`
+    ? `Neural flight proliferation Δ ${number(neuralProliferation.delta, 2)} ± ${number(neuralProliferation.sd, 2)} bootstrap SD (n=${number(neuralProliferation.n)} pairs); the neural prior in the reduced model uses a 0.9109 multiplier.`
     : "No neural flight proliferation contrast is available.";
   fillDetails(document.querySelector("#omics-model-info"), [
     ["Dataset and interpretation", [
       pair("Data", "NASA OSD RNA-seq processed into ORBIO programme scores"),
       pair("Programmes", "Proliferation · apoptosis · anti-apoptosis · hypoxia · glycolysis · adhesion · OXPHOS"),
       pair("Uncertainty", "Reported SD for available measured contrasts"),
-      pair("Calibration rule", "Only sufficiently clear condition-level signals are used as illustrative model priors"),
+      pair("Calibration rule", "Condition-level signals with a clear direction set the reduced-model priors"),
       pair("Verified example", neuralExample)
     ]]
   ]);

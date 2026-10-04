@@ -1,9 +1,11 @@
-import {
+﻿import {
   GRAVITY_OPTIONS,
   TISSUE_OPTIONS,
   computeIllustrativeSensitivity,
+  checkStateInvariants,
   createIllustrativeTrajectory,
-  getScenarioState
+  getScenarioState,
+  growthStats
 } from "./scenario-model.js";
 import {
   renderCellStates,
@@ -20,6 +22,9 @@ import { renderHeroContext, renderModelDetails } from "./model-info.js";
 const repositoryOmics = window.ORBIO_REPOSITORY_OMICS || {};
 const runMetadata = window.ORBIO_RUN_METADATA || {};
 const growthChart = document.querySelector("#growth-chart");
+const devMode = ["localhost", "127.0.0.1"].includes(location.hostname) || new URLSearchParams(location.search).has("debug");
+const warnedInvariants = new Set();
+let growthSummary = null;
 const viewer = createOrganoidViewer(
   document.querySelector("#organoid-canvas"),
   document.querySelector("#fallback-canvas"),
@@ -89,9 +94,36 @@ function applyGravityEffect(current, gravity, tissue, morphology) {
   }
 }
 
+function renderGrowthSummary() {
+  const stats = growthSummary;
+  const note = document.querySelector("#growth-stats-note");
+  const gravityLabel = GRAVITY_OPTIONS.find(({ value }) => value === scenario.gravity).label;
+  const fold = (logFold) => `${Math.exp(logFold).toFixed(1)}×`;
+  let text = `Selected condition (${gravityLabel}): Day 0→7 population growth ${stats.populationGrowthDay0ToDay7.toFixed(1)}×; ` +
+    `viable-volume growth Day 1→7 ln-fold ${stats.logFoldDay1ToDay7.toFixed(2)} (${fold(stats.logFoldDay1ToDay7)}).`;
+  const reference = runMetadata.faceValidity?.byTissueAndGravity?.[scenario.tissue]?.[scenario.gravity];
+  if (reference && reference.n > 0) {
+    text += ` Pipeline reference for this tissue and gravity (untreated, uncensored, median): ln-fold ${reference.median_log_fold.toFixed(2)} ` +
+      `(${fold(reference.median_log_fold)}), n = ${reference.n}.`;
+  }
+  note.textContent = text;
+  document.querySelector("#growth-source").textContent = "SOURCE · Reduced mechanistic model · Pipeline reference: outputs/pipeline_corrected_v2/summary.json";
+}
+
+function checkInvariants(state) {
+  if (!devMode) return;
+  checkStateInvariants(state, `${scenario.gravity}/${scenario.tissue}/${scenario.morphology}@${state.time.day.toFixed(1)}`)
+    .forEach((message) => {
+      if (warnedInvariants.has(message)) return;
+      warnedInvariants.add(message);
+      console.warn(message);
+    });
+}
+
 function renderDynamicState() {
   currentState = getScenarioState(selectedTrajectory, currentTime);
   applyGravityEffect(currentState, scenario.gravity, scenario.tissue, scenario.morphology);
+  checkInvariants(currentState);
   ui.setTime(currentTime);
   ui.renderState(currentState, scenario);
   viewer.setState(currentState, scenario.morphology);
@@ -111,14 +143,14 @@ function updateScenarioModel() {
   sensitivity = computeIllustrativeSensitivity(scenario.gravity, scenario.tissue, scenario.morphology, repositoryOmics);
   currentState = getScenarioState(selectedTrajectory, currentTime);
   applyGravityEffect(currentState, scenario.gravity, scenario.tissue, scenario.morphology);
+  growthSummary = growthStats(selectedTrajectory);
+  renderGrowthSummary();
   const tissueLabel = TISSUE_OPTIONS.find(({ value }) => value === scenario.tissue).shortLabel;
   document.querySelector("#growth-subtitle").textContent = `${tissueLabel} · ${scenario.morphology}`;
   renderGravityCurves(growthChart, trajectories, scenario.gravity);
   renderSensitivity(document, sensitivity);
   renderMolecularEvidence(document.querySelector("#omics-chart"), currentState);
-  document.querySelector(".sensitivity-source").textContent = sensitivity.sourceType === "model"
-    ? "Reduced-model sensitivity"
-    : "Illustrative sensitivity";
+  document.querySelector("#sensitivity-source").textContent = "SOURCE · Reduced-model sensitivity (one-at-a-time, ±50%)";
   renderDynamicState();
 }
 
@@ -141,6 +173,18 @@ function advancePlayback(timestamp) {
   }
   playbackFrame = requestAnimationFrame(advancePlayback);
 }
+
+let resizeTimer = 0;
+new ResizeObserver(() => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if (!trajectories.size) return;
+    const width = Math.round(growthChart.parentElement.clientWidth);
+    if (String(width) === growthChart.dataset.width) return;
+    renderGravityCurves(growthChart, trajectories, scenario.gravity);
+    updateGravityMarkers(growthChart, trajectories, currentTime);
+  }, 80);
+}).observe(growthChart.parentElement);
 
 window.addEventListener("pagehide", () => {
   if (playing) cancelAnimationFrame(playbackFrame);

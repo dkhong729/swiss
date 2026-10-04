@@ -1,10 +1,10 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#f7f4ee">
-    <meta name="description" content="Explore an illustrative ORBIO virtual organoid experiment across gravity, tissue and morphology.">
+    <meta name="description" content="Explore an ORBIO virtual organoid experiment across gravity, tissue and morphology.">
     <title>ORBIO — Virtual Experiment</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/orbio.css') }}">
     <script>window.ORBIO_REPOSITORY_OMICS = {{ omics_data | tojson }};</script>
@@ -18,7 +18,7 @@
         <span class="wordmark-mark" aria-hidden="true"></span><span>ORBIO</span>
       </a>
       <span class="header-context">VIRTUAL EXPERIMENT</span>
-      <span class="demo-label"><span aria-hidden="true"></span>Illustrative demo</span>
+      <span class="header-status">Reduced mechanistic model</span>
     </header>
 
     <aside class="experiment-drawer" id="experiment-drawer" aria-label="Experiment design">
@@ -64,7 +64,7 @@
         </div>
       </div>
       <button class="drawer-toggle" id="drawer-toggle" type="button" aria-expanded="false" aria-controls="experiment-drawer">
-        <span class="drawer-icon" aria-hidden="true">＋</span><span>Design experiment</span>
+        <span class="drawer-icon" aria-hidden="true">☰</span><span class="drawer-toggle-label">Experiment</span>
       </button>
     </aside>
 
@@ -87,10 +87,12 @@
             <span class="stage-day" id="stage-day">DAY 0.0</span>
           </div>
           <div class="organoid-viewport" id="organoid-viewport">
-            <canvas id="organoid-canvas" aria-label="Three-dimensional virtual organoid"></canvas>
-            <div class="viewer-fallback" id="viewer-fallback" hidden>
-              <canvas id="fallback-canvas" aria-label="Schematic virtual organoid visualization"></canvas>
-              <p>3D preview unavailable — showing a schematic view.</p>
+            <div class="viewer-canvas-box" id="viewer-canvas-box">
+              <canvas id="organoid-canvas" aria-label="Three-dimensional virtual organoid"></canvas>
+              <div class="viewer-fallback" id="viewer-fallback" hidden>
+                <canvas id="fallback-canvas" aria-label="Schematic virtual organoid visualization"></canvas>
+                <p>3D preview unavailable — showing a 2D view.</p>
+              </div>
             </div>
             <div class="viewer-field-toggles" id="viewer-layer-toggles" aria-label="Unified scene layers">
               <button type="button" data-layer="cells" aria-pressed="true">Cells</button>
@@ -100,11 +102,14 @@
               <button type="button" data-layer="voxels" aria-pressed="false">Voxels</button>
             </div>
             <div class="viewer-cut-modes" id="viewer-cut-modes" role="group" aria-label="Section view mode">
-              <button type="button" data-cut-mode="full" aria-pressed="false">Full 3D</button>
-              <button type="button" data-cut-mode="half" aria-pressed="true">Half cut</button>
+              <button type="button" data-cut-mode="full" aria-pressed="true">Full 3D</button>
               <button type="button" data-cut-mode="cross" aria-pressed="false">Cross-section</button>
             </div>
-            <div class="morphology-tag" id="morphology-tag">HOLLOW CYST</div>
+            <div class="viewer-morphology" id="viewer-morphology" role="group" aria-label="Morphology">
+              <span class="viewer-control-label">Morphology</span>
+              <button type="button" data-value="solid" aria-pressed="false">Solid</button>
+              <button type="button" data-value="cyst" aria-pressed="true">Cyst</button>
+            </div>
           </div>
           <div class="timeline">
             <div class="timeline-controls">
@@ -113,7 +118,7 @@
               <output id="timeline-day" for="timeline">Day 0.0</output>
             </div>
             <input id="timeline" type="range" min="0" max="1" step="0.001" value="0" aria-label="Experiment timeline, day 0 to day 7">
-            <div class="timeline-ticks" aria-hidden="true"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7 days</span></div>
+            <div class="timeline-ticks" aria-hidden="true"><span>0</span><span class="tick-minor">1</span><span>2</span><span class="tick-minor">3</span><span>4</span><span class="tick-minor">5</span><span>6</span><span>7 d</span></div>
           </div>
           <div class="metric-strip" aria-label="Current experiment metrics">
             <div><span>Est. biological cells</span><strong id="metric-cells">130</strong><small id="metric-representative">~130 representative cells/clusters shown</small></div>
@@ -145,7 +150,7 @@
               <span>Radial transport profile (bulk → depletion layer → tissue)</span>
               <span id="transport-day">DAY 0.0</span>
             </div>
-            <svg id="transport-profile" viewBox="0 0 760 300" role="img" aria-label="Radial O2 and glucose profile from bulk medium to organoid core">
+            <div class="chart-scroll"><svg id="transport-profile" viewBox="0 0 760 300" role="img" aria-label="Radial O2 and glucose profile from bulk medium to organoid core">
               <g class="chart-grid" aria-hidden="true">
                 <line x1="62" y1="255" x2="738" y2="255"></line>
                 <line x1="62" y1="22" x2="62" y2="255"></line>
@@ -162,9 +167,10 @@
               <text x="62" y="279" class="cross-section-label">Bulk medium</text>
               <text x="370" y="279" class="cross-section-label">Depletion layer</text>
               <text x="618" y="279" class="cross-section-label">Tissue interior</text>
-              <text id="profile-o2-depletion" x="62" y="40" class="cross-section-label">ΔO₂ bulk→surface</text>
-              <text id="profile-regime" x="62" y="58" class="cross-section-label">δ/R · ΦO₂</text>
-            </svg>
+              <text id="profile-o2-depletion" x="76" y="44" class="cross-section-label">ΔO₂ bulk→surface</text>
+              <text id="profile-regime" x="76" y="68" class="cross-section-label">δ/R · ΦO₂</text>
+            </svg></div>
+            <p class="source-line" id="transport-source">SOURCE · Reduced mechanistic model</p>
             <p class="figure-footnote" id="profile-lumen-note">Transport profile annotation.</p>
           </div>
           <div class="spatial-controls">
@@ -203,7 +209,7 @@
           </div>
           <p class="section-description" id="growth-subtitle">CRC tumour organoid · Cyst</p>
         </div>
-        <p class="figure-label">GROWTH FROM DAY 0 · reduced-order browser trajectories</p>
+        <p class="figure-label">Growth from Day 0 (population estimate)</p>
         <div class="trajectory-grid">
           <figure class="growth-figure">
             <div class="chart-y-label">Growth from Day 0</div>
@@ -216,7 +222,8 @@
               </svg>
             </div>
             <div class="gravity-legend" id="gravity-legend"></div>
-            <p class="figure-footnote growth-note">Growth is normalized to the Day-0 population index; estimated absolute biological cell count is reported above.</p>
+            <p class="source-line" id="growth-source">SOURCE · Reduced mechanistic model</p>
+            <p class="figure-footnote growth-note" id="growth-stats-note"></p>
           </figure>
           <div class="cell-state-panel">
             <div class="cell-state-heading"><div><p class="eyebrow">Current day <span id="cell-state-day">0.0</span></p><h3>Cellular state</h3></div></div>
@@ -254,9 +261,9 @@
           <p class="section-description">Day-7 local response to a ±50% parameter perturbation.</p>
         </div>
         <div class="sensitivity-figure">
-          <div class="sensitivity-legend"><span><i class="low-swatch"></i>−50%</span><span><i class="high-swatch"></i>+50%</span><span class="sensitivity-source">Illustrative model sensitivity</span></div>
-          <div class="tornado-chart" id="tornado-chart" role="img" aria-label="Illustrative local sensitivity analysis"></div>
-          <p class="figure-footnote">Bars show Day-7 log viable-cell-volume proxy changes relative to the current scenario; the reduced model uses a fixed per-cell volume, and drug EC50 is omitted because this experiment has no drug input.</p>
+          <div class="sensitivity-legend"><span><i class="low-swatch"></i>−50%</span><span><i class="high-swatch"></i>+50%</span><span class="sensitivity-source" id="sensitivity-source">Reduced-model sensitivity</span></div>
+          <div class="tornado-chart" id="tornado-chart" role="img" aria-label="Reduced-model sensitivity analysis"></div>
+          <p class="figure-footnote">Bars show the Day-7 change in viable cell volume (ln-fold units) relative to the current scenario, with each parameter varied to 0.5× and 1.5× of baseline.</p>
         </div>
         <details class="figure-info">
           <summary>Sensitivity method &amp; scope</summary>
@@ -270,19 +277,20 @@
             <p class="eyebrow">05 — Molecular evidence</p>
             <h2 id="omics-title">Multi-omics gravity contrast</h2>
           </div>
-          <p class="section-description" id="omics-subtitle">Programme scores are condition-level evidence, not a D0–D7 time series.</p>
+          <p class="section-description" id="omics-subtitle">Programme scores summarise condition-level evidence for each gravity condition.</p>
         </div>
         <div class="omics-figure">
           <div class="omics-chart-topline">
-            <span id="omics-source">Illustrative programme index</span>
+            <span id="omics-source">Programme index</span>
             <span>Contrast relative to matched Ground 1g</span>
           </div>
-          <svg id="omics-chart" viewBox="0 0 760 370" role="img" aria-label="Multi-omics programme contrast relative to matched ground 1g">
+          <div class="chart-scroll"><svg id="omics-chart" viewBox="0 0 760 370" role="img" aria-label="Multi-omics programme contrast relative to matched ground 1g">
             <g class="omics-grid" aria-hidden="true"></g>
             <g class="omics-bars"></g>
             <g class="omics-labels" aria-hidden="true"></g>
-          </svg>
-          <p class="figure-footnote" id="omics-footnote">Illustrative scores have no error bars. Repository contrasts retain their reported SD; no longitudinal omics data are implied.</p>
+          </svg></div>
+          <p class="source-line" id="omics-source-line"></p>
+          <p class="figure-footnote" id="omics-footnote"></p>
         </div>
         <details class="figure-info">
           <summary>Dataset &amp; calibration provenance</summary>
@@ -293,7 +301,7 @@
 
     <footer class="site-footer">
       <span>ORBIO <span aria-hidden="true">·</span> Virtual organoid</span>
-      <span>Illustrative trajectory engine · ORBIO virtual organoid</span>
+      <span>Reduced mechanistic model · ORBIO virtual organoid</span>
     </footer>
   </body>
 </html>

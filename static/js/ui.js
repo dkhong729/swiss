@@ -1,4 +1,4 @@
-import { GRAVITY_OPTIONS, MORPHOLOGY_OPTIONS, TISSUE_OPTIONS } from "./scenario-model.js";
+﻿import { GRAVITY_OPTIONS, MORPHOLOGY_OPTIONS, TISSUE_OPTIONS } from "./scenario-model.js";
 
 const optionFor = (options, value) => options.find((option) => option.value === value);
 const formatCells = (count) => count >= 1000
@@ -23,7 +23,7 @@ export function createInterface(onScenarioChange, onTimeChange, onPlaybackChange
   const drawerToggle = document.querySelector("#drawer-toggle");
   const drawerPanel = drawer.querySelector(".drawer-panel");
   const gravityButtons = [...document.querySelectorAll("#gravity-options button")];
-  const morphologyButtons = [...document.querySelectorAll("#morphology-options button")];
+  const morphologyButtons = [...document.querySelectorAll("#morphology-options button, #viewer-morphology button")];
   const tissueSelect = document.querySelector("#tissue-select");
   const timeline = document.querySelector("#timeline");
   const playButton = document.querySelector("#play-toggle");
@@ -33,7 +33,7 @@ export function createInterface(onScenarioChange, onTimeChange, onPlaybackChange
   const cutModeButtons = [...document.querySelectorAll("#viewer-cut-modes button")];
   const scenario = { gravity: "flight_ug", tissue: "crc_tumor_organoid", morphology: "cyst" };
   const layers = { cells: true, oxygen: true, glucose: false, depletion: true, voxels: false };
-  let cutMode = "half";
+  let cutMode = "full";
 
   const updateScenarioLabels = () => {
     const gravity = optionFor(GRAVITY_OPTIONS, scenario.gravity);
@@ -43,7 +43,6 @@ export function createInterface(onScenarioChange, onTimeChange, onPlaybackChange
     document.querySelector("#scenario-tissue").textContent = tissue.shortLabel;
     document.querySelector("#scenario-morphology").textContent = morphology.label;
     setScenarioCaption(document.querySelector("#scenario-caption"), [gravity.label, tissue.label, morphology.label]);
-    document.querySelector("#morphology-tag").textContent = morphology.value === "cyst" ? "HOLLOW CYST" : "SOLID MORPHOLOGY";
   };
 
   const emitScenarioChange = () => {
@@ -71,8 +70,12 @@ export function createInterface(onScenarioChange, onTimeChange, onPlaybackChange
     const open = !drawer.classList.contains("open");
     drawer.classList.toggle("open", open);
     drawerToggle.setAttribute("aria-expanded", String(open));
-    drawerToggle.querySelector(".drawer-icon").textContent = open ? "×" : "＋";
+    drawerToggle.querySelector(".drawer-icon").textContent = open ? "×" : "☰";
+    drawerToggle.querySelector(".drawer-toggle-label").textContent = open ? "Close" : "Experiment";
     drawerPanel.inert = !open;
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && drawer.classList.contains("open")) drawerToggle.click();
   });
   drawerPanel.inert = true;
   timeline.addEventListener("input", () => onTimeChange(Number(timeline.value)));

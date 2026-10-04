@@ -1,4 +1,4 @@
-export const GRAVITY_OPTIONS = [
+﻿export const GRAVITY_OPTIONS = [
   { value: "ground_1g", label: "Ground 1g", shortLabel: "Ground 1g" },
   { value: "flight_ug", label: "ISS microgravity", shortLabel: "ISS µg" },
   { value: "flight_1g_ctrl", label: "ISS 1g centrifuge", shortLabel: "ISS 1g control" },
@@ -75,6 +75,7 @@ const INITIAL_COUNTS = { proliferating: 88, quiescent: 35, apoptotic: 5, necroti
 const INITIAL_BIOLOGICAL_CELLS = 130;
 const SAMPLE_COUNT = 71;
 const DAY_MAX = 7;
+const PARTICLE_CAPACITY = 1000;
 const DT = DAY_MAX / (SAMPLE_COUNT - 1);
 const CLAMP = (value, min, max) => Math.min(max, Math.max(min, value));
 const normalizeFractions = (values) => {
@@ -90,7 +91,7 @@ function evidenceFor(gravity, tissue, repositoryOmics) {
     return {
       scores: Object.fromEntries(MOLECULAR_PROGRAMS.map((name) => [name, exact.programs[name]?.delta ?? 0])),
       metadata: {
-        sourceType: "measured",
+        sourceType: "repo-data",
         sourceFile: exact.sourceFile,
         contrast: exact.contrast,
         detail: exact.detail,
@@ -119,7 +120,7 @@ function evidenceFor(gravity, tissue, repositoryOmics) {
         sourceType: "repo-derived",
         sourceFile: nearby.sourceFile,
         contrast: `${gravity} analogue`,
-        detail: `Scaled from ${nearby.contrast}; this condition has no direct paired omics table.`,
+        detail: `Scaled from ${nearby.contrast} (${nearby.sourceFile}); no direct paired omics table for this condition.`,
         programs: {}
       }
     };
@@ -272,13 +273,17 @@ function computeTransport(gravity, tissue, geometry, counts, day, perturbations)
   };
 }
 
+const CYST_CROWDING_CELLS = 450;
+
 function stepCounts(gravity, tissue, morphology, counts, transport, perturbations) {
   const tissueProfile = TISSUE_PROFILES[tissue];
   const hypoxicThreshold = FIELD_CONSTANTS.o2Hypoxic * (perturbations.hypoxicThreshold ?? 1);
   const fO2 = concentrationFactors(transport.meanO2, hypoxicThreshold, FIELD_CONSTANTS.o2ProlifSat);
   const fGlucose = concentrationFactors(transport.coreGlucose, FIELD_CONSTANTS.glcMin, 0.45);
   const ugProlif = tissueMicrogravityMultiplier(gravity, tissue, morphology, perturbations);
-  const growthBias = TISSUE_PROFILES[tissue].growthBias * (morphology === "cyst" ? 1.08 : 1);
+  const total = counts.proliferating + counts.quiescent + counts.apoptotic + counts.necrotic;
+  const crowding = morphology === "cyst" ? 1 / (1 + total / CYST_CROWDING_CELLS) : 1;
+  const growthBias = TISSUE_PROFILES[tissue].growthBias * crowding;
   const effectiveCycle = FIELD_CONSTANTS.cycleDays / (perturbations.cycleRate ?? 1);
   const divisionRate = (Math.log(2) / effectiveCycle) * ugProlif * growthBias * fO2 * fGlucose;
   const pToQ = CLAMP((1 - fO2) * 0.25 + (1 - fGlucose) * 0.2 + transport.severeStress * 0.12, 0, 0.8);
@@ -355,9 +360,9 @@ function buildState(gravity, tissue, morphology, timeIndex, counts, evidence, pe
       geometry: "model",
       molecularEvidence: evidence.metadata.sourceType,
       assumptions: {
-        packingFraction: "illustrative dense-tissue target range 0.64–0.78",
-        lumenNutrientBoundary: "illustrative",
-        renderedParticleCompression: "illustrative representative glyphs",
+        packingFraction: "dense-tissue target range 0.64–0.78",
+        lumenNutrientBoundary: "reduced-model assumption",
+        renderedParticleCompression: "representative glyphs",
         cellGeometry: "deterministic visual packing abstraction"
       }
     },
@@ -438,5 +443,36 @@ export function computeIllustrativeSensitivity(gravity, tissue, morphology, repo
     }).at(-1).phenotype.viableCellVolumeFromDay0;
     return { label, low: Math.log(Math.max(1e-6, low / baseline)), high: Math.log(Math.max(1e-6, high / baseline)) };
   });
-  return { baseline: 0, parameters: results, sourceType: "model" };
+  return { baseline: 0, parameters: results, sourceType: "reduced-model" };
+}
+
+export function growthStats(trajectory) {
+  const viable = (s) => s.phenotype.viableCellVolumeFromDay0;
+  const d1 = trajectory[Math.round(1 / DT)];
+  const last = trajectory.at(-1);
+  const logFold = Math.log(viable(last) / viable(d1));
+  return {
+    logFoldDay1ToDay7: logFold,
+    foldDay1ToDay7: Math.exp(logFold),
+    populationGrowthDay0ToDay7: last.population.biologicalCells / INITIAL_BIOLOGICAL_CELLS,
+    viableVolumeGrowthDay0ToDay7: viable(last)
+  };
+}
+
+export function checkStateInvariants(state, label = "state") {
+  const warnings = [];
+  const t = state.transport;
+  const check = (ok, message) => { if (!ok) warnings.push(`${label}: ${message}`); };
+  const eps = 1e-6;
+  check(t.hypoxicFraction >= 0 && t.hypoxicFraction <= 1, "hypoxic fraction outside [0,1]");
+  check(t.coreO2 <= t.meanO2 + eps && t.meanO2 <= t.bulkO2 + eps, "O2 ordering core<=mean<=bulk violated");
+  check(t.coreGlucose <= t.meanGlucose + eps && t.meanGlucose <= t.bulkGlucose + eps, "glucose ordering violated");
+  const sum = Object.values(state.cellState).reduce((a, b) => a + b, 0);
+  check(Math.abs(sum - 1) < 0.01, `cell-state fractions sum to ${sum.toFixed(3)}`);
+  check(state.population.biologicalCells > 0, "cell count not positive");
+  check(state.phenotype.growthFromDay0 > 0, "growth not positive");
+  check(state.population.renderedParticles <= PARTICLE_CAPACITY, "rendered particles exceed capacity");
+  if (state.geometry.morphology === "cyst") check(state.geometry.lumenRadiusUm < state.geometry.radiusUm, "lumen radius >= outer radius");
+  else check(state.geometry.lumenRadiusUm === 0, "solid morphology has a lumen");
+  return warnings;
 }
