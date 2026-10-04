@@ -238,6 +238,7 @@ function route(){
   requestAnimationFrame(()=>{anchor?anchor.scrollIntoView():window.scrollTo(0,0)});
 }
 addEventListener("hashchange",route);
+route();
 
 const REDUCE=matchMedia("(prefers-reduced-motion: reduce)");
 // the embedded experiment reports its height; the page keeps the only scrollbar

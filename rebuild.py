@@ -31,8 +31,34 @@ t=t.replace('href="/" aria-label','href="../#technology" target="_top" aria-labe
 assert "{{" not in t and "{%" not in t, re.findall(r"{[{%][^}]*[}%]}",t)
 for sub in ("css","js"): shutil.copytree(SRC/"static"/sub, EXP/sub)
 
+# Keep the always-visible controls when refreshing an older drawer-based drop.
+previous_page = (PREV/"experiment/index.html").read_text()
+design = re.search(r'      <section class="experiment-design".*?</section>', previous_page, re.S)
+assert design, "experiment design section not found"
+t, drawer_count = re.subn(r'    <aside class="experiment-drawer".*?</aside>\s*', '', t, count=1, flags=re.S)
+assert drawer_count == 1, "experiment drawer not found"
+t = t.replace('<main id="main">', '<main id="main">\n' + design.group(0) + '\n', 1)
+ui_path = EXP/"js/ui.js"
+ui = ui_path.read_text()
+for line in [
+    '  const drawer = document.querySelector("#experiment-drawer");\n',
+    '  const drawerToggle = document.querySelector("#drawer-toggle");\n',
+    '  const drawerPanel = drawer.querySelector(".drawer-panel");\n',
+]:
+    ui = ui.replace(line, '')
+drawer_start = ui.index('  drawerToggle.addEventListener("click"')
+drawer_end = ui.index('  drawerPanel.inert = true;', drawer_start) + len('  drawerPanel.inert = true;\n')
+ui_path.write_text(ui[:drawer_start] + ui[drawer_end:])
+
 # ---------- 2. palette ----------
 css=(EXP/"css/orbio.css").read_text()
+previous_css = (PREV/"experiment/css/orbio.css").read_text()
+design_css = previous_css[previous_css.index('/* Experiment design */'):previous_css.index('\n.site-footer {')]
+drawer_start = css.index('/* Experiment drawer */')
+drawer_end = css.index('\n.site-footer {', drawer_start)
+css = css[:drawer_start] + design_css + css[drawer_end:]
+css = re.sub(r'  \.(?:experiment-drawer|drawer-panel) \{[^}]*\}\n', '', css)
+css = css.replace('.control-group select { border-radius: 10px; }', '.control-group select { border-radius: 4px; }')
 m=re.search(r':root \{\n  color-scheme: light;(.*?)\n  --header-h', css, re.S)
 assert m, "token block not found"
 css=css.replace(m.group(0), """:root {
@@ -100,11 +126,6 @@ svg text { fill: var(--muted); }
 /* presentation mode: no file paths, no dense per-run statistics */
 .source-line, #growth-stats-note, #omics-footnote { display: none; }
 
-/* embedded in the main site: the drawer button needs its own strip */
-html.embedded .experiment-drawer { top: 0; }
-html.embedded main { padding-top: 76px; }
-html.embedded .drawer-panel { padding-top: 5.4rem; }
-
 .site-footer-mountains {
   position: relative; width: 100%; height: 240px; overflow: hidden; margin-top: 56px; background: transparent;
   --mountain-back: #15223A; --mountain-front: #1C2C44; --mountain-snow: #CEDAE4;
@@ -114,7 +135,6 @@ html.embedded .drawer-panel { padding-top: 5.4rem; }
 .site-footer-note { padding: 10px clamp(1.2rem, 4vw, 4.5rem) 48px; font-size: 1.1rem; color: var(--muted); }
 @media (max-width: 767px) {
   .header-status { display: none; }
-  .experiment-section { padding-top: 5.5rem; }
   .scenario-caption { display: none; }
 }
 """

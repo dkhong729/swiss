@@ -19,9 +19,6 @@ function setScenarioCaption(element, labels) {
 }
 
 export function createInterface(onScenarioChange, onTimeChange, onPlaybackChange, onLayerChange, onCutModeChange) {
-  const drawer = document.querySelector("#experiment-drawer");
-  const drawerToggle = document.querySelector("#drawer-toggle");
-  const drawerPanel = drawer.querySelector(".drawer-panel");
   const gravityButtons = [...document.querySelectorAll("#gravity-options button")];
   const morphologyButtons = [...document.querySelectorAll("#morphology-options button, #viewer-morphology button")];
   const tissueSelect = document.querySelector("#tissue-select");
@@ -66,18 +63,6 @@ export function createInterface(onScenarioChange, onTimeChange, onPlaybackChange
     emitScenarioChange();
   });
 
-  drawerToggle.addEventListener("click", () => {
-    const open = !drawer.classList.contains("open");
-    drawer.classList.toggle("open", open);
-    drawerToggle.setAttribute("aria-expanded", String(open));
-    drawerToggle.querySelector(".drawer-icon").textContent = open ? "×" : "☰";
-    drawerToggle.querySelector(".drawer-toggle-label").textContent = open ? "Close" : "Experiment";
-    drawerPanel.inert = !open;
-  });
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && drawer.classList.contains("open")) drawerToggle.click();
-  });
-  drawerPanel.inert = true;
   timeline.addEventListener("input", () => onTimeChange(Number(timeline.value)));
   playButton.addEventListener("click", () => onPlaybackChange());
   const loopButton = document.querySelector("#loop-toggle");

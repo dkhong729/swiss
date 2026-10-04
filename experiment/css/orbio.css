@@ -312,38 +312,20 @@ h3 { margin: 0; font-size: 1.5rem; line-height: 1.2; font-weight: 700; }
 .omics-error, .omics-error-cap { stroke: var(--ink); stroke-width: 1.5; }
 .omics-value-label { fill: var(--ink) !important; }
 
-/* Experiment drawer */
-.experiment-drawer {
-  position: fixed; z-index: 90; top: var(--header-h); bottom: 0; left: 0;
-  width: min(400px, 100vw); transform: translateX(-100%);
-  transition: transform 280ms cubic-bezier(.2, .7, .2, 1); pointer-events: none;
+/* Experiment design */
+.experiment-design { padding: 2rem 0 1.5rem; border-bottom: 1px solid var(--line); }
+#experiment-design-title { margin: 0 0 1.25rem; font-size: 1.4rem; letter-spacing: 0; }
+.experiment-controls {
+  display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.2fr) minmax(0, 0.7fr);
+  gap: 1.25rem 2rem; align-items: start;
 }
-.experiment-drawer.open { transform: translateX(0); }
-.experiment-drawer:not(.open) .drawer-panel { visibility: hidden; transition: visibility 0s linear 280ms; }
-.drawer-panel {
-  position: absolute; inset: 0; overflow-y: auto; padding: 4.8rem 1.4rem 2rem;
-  border-right: 1px solid var(--line-strong); background: var(--paper-strong);
-  box-shadow: 12px 0 30px rgba(4, 9, 16, 0.45); pointer-events: auto;
-}
-.drawer-toggle {
-  position: absolute; top: 0.9rem; left: 100%; margin-left: 0.6rem; z-index: 2;
-  min-height: 48px; padding: 0.4rem 1rem; display: inline-flex; align-items: center; gap: 0.55rem;
-  border: 1px solid var(--ink); border-radius: 4px; color: #0A1322; background: var(--cobalt);
-  cursor: pointer; font-size: 1.05rem; font-weight: 700; pointer-events: auto;
-  box-shadow: 0 6px 18px rgba(4, 9, 16, 0.45);
-}
-.experiment-drawer.open .drawer-toggle { left: auto; right: 1rem; margin-left: 0; }
-.drawer-icon { font-size: 1.25rem; line-height: 1; }
-.drawer-heading { padding-bottom: 1.1rem; border-bottom: 1px solid var(--line); }
-.drawer-heading h2 { font-size: 1.7rem; }
-.drawer-heading > p:last-child { margin: 0.5rem 0 0; color: var(--muted); font-size: 1rem; }
-.control-group { min-width: 0; margin: 1.3rem 0 0; padding: 0; border: 0; }
-.control-group legend { margin-bottom: 0.6rem; padding: 0; font-size: 1.1rem; font-weight: 720; }
-.choice-list, .choice-row { display: grid; gap: 0.45rem; }
-.choice-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.control-group { min-width: 0; margin: 0; padding: 0; border: 0; }
+.control-group legend { margin-bottom: 0.6rem; padding: 0; font-size: 1rem; font-weight: 720; }
+.choice-list, .choice-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.45rem; }
 .choice-list button, .choice-row button {
-  min-height: var(--touch); padding: 0.5rem 0.8rem; border: 1px solid var(--line-strong);
-  background: transparent; text-align: left; cursor: pointer; font-size: 1.05rem;
+  min-height: 48px; padding: 0.5rem 0.65rem; border: 1px solid var(--line-strong); border-radius: 4px;
+  background: transparent; text-align: left; cursor: pointer; font-size: 16px; line-height: 1.4;
+  overflow-wrap: anywhere;
   transition: color 140ms ease, background 140ms ease, border-color 140ms ease;
 }
 .choice-row button { text-align: center; }
@@ -352,12 +334,26 @@ h3 { margin: 0; font-size: 1.5rem; line-height: 1.2; font-weight: 700; }
   border-color: var(--ink); color: #0A1322; background: var(--cobalt);
 }
 .control-group select {
-  width: 100%; min-height: var(--touch); padding: 0.5rem 0.7rem; border: 1px solid var(--line-strong);
-  border-radius: 0; color: var(--ink); background: var(--paper-strong); cursor: pointer; font-size: 1.05rem;
+  width: 100%; min-height: 48px; padding: 0.5rem 0.7rem; border: 1px solid var(--line-strong);
+  border-radius: 4px; color: var(--ink); background: var(--paper-strong); cursor: pointer; font-size: 16px;
 }
-.scenario-summary { display: grid; gap: 0.2rem; margin-top: 1.5rem; padding: 1rem 0 0; border-top: 1px solid var(--line); }
-.scenario-summary strong { font-size: 1.15rem; }
-.scenario-summary > span { color: var(--muted); font-size: 1rem; }
+.scenario-summary {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.35rem 1.25rem;
+  margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--line);
+  font-size: 16px; overflow-wrap: anywhere;
+}
+.scenario-summary .eyebrow { margin: 0; font-size: 14px; letter-spacing: 0; }
+.scenario-summary > span { color: var(--muted); }
+@media (max-width: 991px) {
+  .experiment-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .experiment-controls .control-group:first-child { grid-column: 1 / -1; }
+  .choice-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 767px) {
+  .experiment-controls { grid-template-columns: minmax(0, 1fr); }
+  .choice-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .scenario-summary .eyebrow { flex-basis: 100%; }
+}
 
 .site-footer {
   display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 1rem; padding: 1.2rem 4vw;
@@ -408,8 +404,6 @@ h3 { margin: 0; font-size: 1.5rem; line-height: 1.2; font-weight: 700; }
   .tornado-row { grid-template-columns: minmax(0, 1fr) 96px; padding: 0.4rem 0; }
   .tornado-name { grid-column: 1 / -1; }
   .sensitivity-source { margin-left: 0; }
-  .experiment-drawer { width: 100vw; }
-  .drawer-panel { padding-top: 5rem; }
   .cross-section-panel, .sensitivity-figure, .omics-figure { padding: 0.8rem; }
 }
 
@@ -447,7 +441,7 @@ h3 { font-size: 1.4rem; }
 }
 .sensitivity-figure, .omics-figure { padding: 1rem 1.25rem; }
 .cell-state-panel { padding: 1.25rem; }
-.control-group select { border-radius: 10px; }
+.control-group select { border-radius: 4px; }
 button, .control-group select { transition: background-color .18s, box-shadow .18s, transform .18s; }
 button:not(:disabled):hover { box-shadow: 0 4px 12px rgba(16, 34, 53, 0.12); }
 .site-footer { border-top: 1px solid var(--line); }
@@ -486,7 +480,6 @@ button:not(:disabled):hover { box-shadow: 0 4px 12px rgba(16, 34, 53, 0.12); }
   .stage-accuracy { margin-right: 0; }
   .viewer-legend .legend-note { margin-left: 0; flex-basis: 100%; }
   .header-status { display: none; }
-  .experiment-section { padding-top: 5.5rem; }
   .scenario-caption { display: none; }
 }
 
@@ -501,11 +494,6 @@ svg text { fill: var(--muted); }
 
 /* presentation mode: no file paths, no dense per-run statistics */
 .source-line, #growth-stats-note, #omics-footnote { display: none; }
-
-/* embedded in the main site: the drawer button needs its own strip */
-html.embedded .experiment-drawer { top: 0; }
-html.embedded main { padding-top: 76px; }
-html.embedded .drawer-panel { padding-top: 5.4rem; }
 
 .site-footer-mountains {
   position: relative; width: 100%; height: 240px; overflow: hidden; margin-top: 56px; background: transparent;

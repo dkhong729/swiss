@@ -30,54 +30,47 @@
       <span class="header-status">Reduced mechanistic model</span>
     </header>
 
-    <aside class="experiment-drawer" id="experiment-drawer" aria-label="Experiment design">
-      <div class="drawer-panel">
-        <div class="drawer-heading">
-          <p class="eyebrow">Experiment design</p>
-          <h2>Change the conditions</h2>
-          <p>Selections update the virtual experiment immediately.</p>
+    <main id="main">
+      <section class="experiment-design" aria-labelledby="experiment-design-title">
+        <h2 id="experiment-design-title">Experiment design</h2>
+        <div class="experiment-controls">
+          <fieldset class="control-group">
+            <legend>Gravity</legend>
+            <div class="choice-list" id="gravity-options">
+              <button type="button" data-value="ground_1g" aria-pressed="false">Ground 1g</button>
+              <button type="button" data-value="flight_ug" aria-pressed="true">ISS microgravity</button>
+              <button type="button" data-value="flight_1g_ctrl" aria-pressed="false">ISS 1g centrifuge</button>
+              <button type="button" data-value="sim_ug_rpm" aria-pressed="false">RPM</button>
+              <button type="button" data-value="sim_ug_clinostat" aria-pressed="false">3D clinostat</button>
+            </div>
+          </fieldset>
+          <fieldset class="control-group">
+            <legend>Tissue</legend>
+            <label class="sr-only" for="tissue-select">Tissue type</label>
+            <select id="tissue-select">
+              <option value="generic">Generic organoid</option>
+              <option value="neural">Neural organoid</option>
+              <option value="cardiac">Cardiac organoid</option>
+              <option value="crc_tumor_organoid" selected>Colorectal tumour organoid</option>
+              <option value="cancer_cellline_spheroid">Cancer cell-line spheroid</option>
+            </select>
+          </fieldset>
+          <fieldset class="control-group">
+            <legend>Morphology</legend>
+            <div class="choice-row" id="morphology-options">
+              <button type="button" data-value="solid" aria-pressed="false">Solid</button>
+              <button type="button" data-value="cyst" aria-pressed="true">Cyst</button>
+            </div>
+          </fieldset>
         </div>
-        <fieldset class="control-group">
-          <legend>Gravity</legend>
-          <div class="choice-list" id="gravity-options">
-            <button type="button" data-value="ground_1g" aria-pressed="false">Ground 1g</button>
-            <button type="button" data-value="flight_ug" aria-pressed="true">ISS microgravity</button>
-            <button type="button" data-value="flight_1g_ctrl" aria-pressed="false">ISS 1g centrifuge</button>
-            <button type="button" data-value="sim_ug_rpm" aria-pressed="false">RPM</button>
-            <button type="button" data-value="sim_ug_clinostat" aria-pressed="false">3D clinostat</button>
-          </div>
-        </fieldset>
-        <fieldset class="control-group">
-          <legend>Tissue</legend>
-          <label class="sr-only" for="tissue-select">Tissue type</label>
-          <select id="tissue-select">
-            <option value="generic">Generic organoid</option>
-            <option value="neural">Neural organoid</option>
-            <option value="cardiac">Cardiac organoid</option>
-            <option value="crc_tumor_organoid" selected>Colorectal tumour organoid</option>
-            <option value="cancer_cellline_spheroid">Cancer cell-line spheroid</option>
-          </select>
-        </fieldset>
-        <fieldset class="control-group">
-          <legend>Morphology</legend>
-          <div class="choice-row" id="morphology-options">
-            <button type="button" data-value="solid" aria-pressed="false">Solid</button>
-            <button type="button" data-value="cyst" aria-pressed="true">Cyst</button>
-          </div>
-        </fieldset>
         <div class="scenario-summary" aria-live="polite">
           <p class="eyebrow">Current scenario</p>
           <strong id="scenario-gravity">ISS µg</strong>
           <span id="scenario-tissue">CRC tumour organoid</span>
           <span id="scenario-morphology">Cyst</span>
         </div>
-      </div>
-      <button class="drawer-toggle" id="drawer-toggle" type="button" aria-expanded="false" aria-controls="experiment-drawer">
-        <span class="drawer-icon" aria-hidden="true">☰</span><span class="drawer-toggle-label">Experiment</span>
-      </button>
-    </aside>
+      </section>
 
-    <main id="main">
       <section class="experiment-section" aria-labelledby="experiment-title">
         <div class="section-heading">
           <div>
