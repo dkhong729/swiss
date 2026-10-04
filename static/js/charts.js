@@ -164,11 +164,24 @@ function divergingBar(track, value, className, maxMagnitude) {
   track.appendChild(bar);
 }
 
+const CONDITION_NAMES = {
+  ground_1g: "Ground 1g",
+  flight_ug: "ISS microgravity",
+  flight_1g_ctrl: "ISS 1g centrifuge",
+  sim_ug_rpm: "RPM",
+  sim_ug_clinostat: "3D clinostat"
+};
+
+function humanizeConditions(text = "") {
+  return text.replace(/\b(ground_1g|flight_ug|flight_1g_ctrl|sim_ug_rpm|sim_ug_clinostat)\b/g, (key) => CONDITION_NAMES[key]);
+}
+
 export function renderSensitivity(root, sensitivity) {
   const chart = root.querySelector("#tornado-chart");
   chart.replaceChildren();
   const maxMagnitude = Math.max(0.08, ...sensitivity.parameters.flatMap(({ low, high }) => [Math.abs(low), Math.abs(high)]));
-  sensitivity.parameters.forEach(({ label, low, high }) => {
+  const active = sensitivity.parameters.filter(({ low, high }) => Math.max(Math.abs(low), Math.abs(high)) >= 0.005);
+  (active.length ? active : sensitivity.parameters).forEach(({ label, low, high }) => {
     const row = document.createElement("div");
     row.className = "tornado-row";
     const name = document.createElement("span");
@@ -253,16 +266,17 @@ export function renderMolecularEvidence(svg, state) {
   });
   const measured = metadata.sourceType === "repo-data";
   const derived = metadata.sourceType === "repo-derived";
+  const contrastText = humanizeConditions(metadata.contrast);
   const sourceLabel = measured
-    ? `SOURCE · NASA OSD-940 reanalysis · ${metadata.sourceFile}`
-    : derived ? `SOURCE · Repository contrast, scaled · ${metadata.sourceFile || "outputs/omics"}`
-      : "SOURCE · Programme index from tissue-level directional evidence";
-  document.querySelector("#omics-source").textContent = metadata.contrast;
+    ? "SOURCE · NASA OSD-940 RNA-seq reanalysis"
+    : derived ? "SOURCE · NASA OSD RNA-seq reanalysis, scaled to this condition"
+      : "SOURCE · Programme index from tissue-level evidence";
+  document.querySelector("#omics-source").textContent = contrastText;
   document.querySelector("#omics-source-line").textContent = sourceLabel;
   document.querySelector("#omics-footnote").textContent = measured
-    ? `Contrast ${metadata.contrast}. Bars show the reported programme delta; whiskers show the reported SD. Condition-level evidence (n per group in the repository table).`
+    ? `${contrastText}. Bars show the programme change; whiskers show the standard deviation.`
     : derived
-      ? `${metadata.detail} Bars show the scaled programme delta.`
-      : `Programme index for ${metadata.contrast}. Bars show direction and relative size per programme.`;
-  svg.setAttribute("aria-label", `Molecular programme contrasts for ${metadata.contrast}; source type ${metadata.sourceType}.`);
+      ? "Bars show the programme change scaled from the closest measured gravity contrast."
+      : `${contrastText}. Bars show direction and relative size for each programme.`;
+  svg.setAttribute("aria-label", `Molecular programme contrasts for ${contrastText}.`);
 }

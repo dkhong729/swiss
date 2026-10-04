@@ -418,3 +418,30 @@ h3 { margin: 0; font-size: 1.5rem; line-height: 1.2; font-weight: 700; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
+
+/* ---- Polish layer: unified type scale and refined surfaces ---- */
+:root {
+  --radius: 16px;
+  --shadow-soft: 0 10px 30px rgba(16, 34, 53, 0.08), 0 2px 6px rgba(16, 34, 53, 0.05);
+  --shadow-card: 0 4px 16px rgba(16, 34, 53, 0.06);
+}
+body { background: linear-gradient(180deg, #fbf9f4 0%, #f3efe6 100%) fixed; color: var(--ink); line-height: 1.55; }
+h1 { font-size: clamp(2.25rem, 4vw, 3.25rem); }
+h2, .section-heading h2 { font-size: clamp(1.6rem, 2.2vw, 2rem); text-transform: none; letter-spacing: -0.015em; font-weight: 700; }
+h3 { font-size: 1.4rem; }
+.eyebrow { color: var(--cobalt); font-weight: 650; }
+.site-header { backdrop-filter: blur(12px); background: rgba(251, 249, 244, 0.86); box-shadow: 0 1px 0 var(--line); }
+.viewer-shell, .viewer-stage { border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-soft); }
+.viewer-canvas-box { background: radial-gradient(ellipse at 50% 40%, #ffffff 0%, #f1f4f6 70%, #e6ebee 100%); }
+.metric-strip { background: var(--paper-strong); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-card); margin-top: 1rem; }
+.metric-strip strong { font-size: clamp(1.5rem, 2vw, 1.9rem); color: var(--cobalt); }
+.growth-chart-wrap, .sensitivity-figure, .omics-figure, .cell-state-panel {
+  border-radius: var(--radius); background: var(--paper-strong); border: 1px solid var(--line); box-shadow: var(--shadow-card);
+}
+.sensitivity-figure, .omics-figure { padding: 1rem 1.25rem; }
+.cell-state-panel { padding: 1.25rem; }
+.control-group select { border-radius: 10px; }
+button, .control-group select { transition: background-color .18s, box-shadow .18s, transform .18s; }
+button:not(:disabled):hover { box-shadow: 0 4px 12px rgba(16, 34, 53, 0.12); }
+.site-footer { border-top: 1px solid var(--line); }
+@media (prefers-reduced-motion: reduce) { button, .control-group select { transition: none; } }

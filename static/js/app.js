@@ -99,15 +99,13 @@ function renderGrowthSummary() {
   const note = document.querySelector("#growth-stats-note");
   const gravityLabel = GRAVITY_OPTIONS.find(({ value }) => value === scenario.gravity).label;
   const fold = (logFold) => `${Math.exp(logFold).toFixed(1)}×`;
-  let text = `Selected condition (${gravityLabel}): Day 0→7 population growth ${stats.populationGrowthDay0ToDay7.toFixed(1)}×; ` +
-    `viable-volume growth Day 1→7 ln-fold ${stats.logFoldDay1ToDay7.toFixed(2)} (${fold(stats.logFoldDay1ToDay7)}).`;
+  let text = `${gravityLabel}: population ${stats.populationGrowthDay0ToDay7.toFixed(1)}× from Day 0 to Day 7; viable volume ${fold(stats.logFoldDay1ToDay7)} from Day 1 to Day 7.`;
   const reference = runMetadata.faceValidity?.byTissueAndGravity?.[scenario.tissue]?.[scenario.gravity];
   if (reference && reference.n > 0) {
-    text += ` Pipeline reference for this tissue and gravity (untreated, uncensored, median): ln-fold ${reference.median_log_fold.toFixed(2)} ` +
-      `(${fold(reference.median_log_fold)}), n = ${reference.n}.`;
+    text += ` ORBIO pipeline reference for this condition: ${fold(reference.median_log_fold)} (median of ${reference.n} runs).`;
   }
   note.textContent = text;
-  document.querySelector("#growth-source").textContent = "SOURCE · Reduced mechanistic model · Pipeline reference: outputs/pipeline_corrected_v2/summary.json";
+  document.querySelector("#growth-source").textContent = "SOURCE · Reduced mechanistic model · ORBIO pipeline reference";
 }
 
 function checkInvariants(state) {
@@ -140,6 +138,7 @@ function updateScenarioModel() {
     createIllustrativeTrajectory(value, scenario.tissue, scenario.morphology, { repositoryOmics })
   ]));
   selectedTrajectory = trajectories.get(scenario.gravity);
+  viewer.setFitState([...trajectories.values()].map((path) => path.at(-1)).reduce((best, state) => (state.geometry.radiusUm > best.geometry.radiusUm ? state : best)));
   sensitivity = computeIllustrativeSensitivity(scenario.gravity, scenario.tissue, scenario.morphology, repositoryOmics);
   currentState = getScenarioState(selectedTrajectory, currentTime);
   applyGravityEffect(currentState, scenario.gravity, scenario.tissue, scenario.morphology);
@@ -150,7 +149,7 @@ function updateScenarioModel() {
   renderGravityCurves(growthChart, trajectories, scenario.gravity);
   renderSensitivity(document, sensitivity);
   renderMolecularEvidence(document.querySelector("#omics-chart"), currentState);
-  document.querySelector("#sensitivity-source").textContent = "SOURCE · Reduced-model sensitivity (one-at-a-time, ±50%)";
+  document.querySelector("#sensitivity-source").textContent = "SOURCE · Reduced mechanistic model · one-at-a-time ±50%";
   renderDynamicState();
 }
 

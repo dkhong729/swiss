@@ -113,7 +113,7 @@ export function createInterface(onScenarioChange, onTimeChange, onPlaybackChange
         `vs matched 1g · ${gravityPercent > 0 ? "+" : ""}${gravityPercent.toFixed(0)}%`;
       document.querySelector("#metric-hypoxia").textContent = `${Math.round(state.transport.hypoxicFraction * 100)}%`;
       document.querySelector("#metric-core-oxygen").textContent = `${Math.round(state.transport.coreO2 * 100)}%`;
-      document.querySelector("#metric-representative").textContent = `~${formatCells(state.population.renderedParticles)} representative cells/clusters modelled`;
+      document.querySelector("#metric-representative").textContent = `~${formatCells(state.population.renderedParticles)} cell markers in 3D`;
       document.querySelector("#metric-sim-agents").textContent = `${formatCells(state.population.simulationAgents)} simulation agents`;
       const signal = state.molecularEvidence;
       const O2arrow = state.transport.coreO2 < 0.55 ? "↓" : "↔";

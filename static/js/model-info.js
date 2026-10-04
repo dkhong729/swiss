@@ -52,7 +52,7 @@ export function renderModelDetails(metadata, omicsData) {
   const capText = Number.isFinite(quality.capped)
     ? `${number(quality.capped)} capped / excluded of ${number(quality.attempted)} attempted (cap policy: ${quality.policy || "not available"})`
     : "Capping statistics not available";
-  const retainedText = Number.isFinite(quality.retained) ? `${number(quality.retained)} uncensored runs retained` : "Not available";
+  const retainedText = Number.isFinite(quality.retained) ? `${number(quality.retained)} of ${number(quality.attempted)} runs retained` : "Not available";
   const grid = Number.isFinite(profile.grid_n) && Number.isFinite(profile.grid_h)
     ? `${number(profile.grid_n)}³ voxels · ${number(profile.grid_h)} µm spacing`
     : "Not available";
@@ -63,43 +63,34 @@ export function renderModelDetails(metadata, omicsData) {
       pair("GPU", gpuName),
       pair("VRAM", vram),
       pair("CUDA / PyTorch", `${gpu.cudaBuild || "Not available"} / ${gpu.torch || "Not available"}`),
-      pair("Compute capability", gpu.computeCapability ? `${gpu.computeCapability} (${(gpu.architecture || []).slice(-1)[0] || "architecture not available"})` : "Not available"),
       pair("Precision", `${bf16} · AMP ${profile.amp === true ? "enabled" : "disabled"}`)
     ]],
     ["Simulation", [
       pair("Model", "GPU-accelerated agent-based virtual organoid"),
-      pair("Profile", profileLabel),
       pair("Field grid", grid),
       pair("Maximum agents", number(profile.max_agents)),
       pair("Scenarios / workers", `${number(profile.n_scenarios)} / ${number(profile.workers)}`),
-      pair("Mechanical pair chunk", number(profile.pair_chunk))
     ]],
     ["AI training", [
       pair("Encoder", `${architecture.encoder || "Not available"} · ${number(architecture.inputFeatures)} features · ${number(architecture.nearestNeighbours)} nearest neighbours`),
       pair("Graph size / batch", `${number(profile.cells_per_graph)} cells per graph · batch ${number(profile.graph_batch)}`),
       pair("Training", `${architecture.pretraining || "Not available"} · ${number(profile.encoder_epochs)} encoder epochs · ${number(profile.head_epochs)} prediction-head epochs`),
       pair("Ensemble", `${number(profile.ensemble)} models · ${number(architecture.embeddingDimensions)} embedding dimensions`),
-      pair("Active learning", `${number(profile.al_baselines)} baselines · ${number(profile.al_rounds)} rounds × ${number(profile.al_batch)} acquisitions`)
     ]],
-    ["Experiment initialisation & quality", [
-      pair("Dataset initialisation", `${number(initial.datasetMinimumAgents)}–${number(initial.datasetMaximumAgents)} simulation agents per virtual experiment`),
-      pair("Scenario default", `${number(initial.scenarioDefaultAgents)} simulation agents`),
-      pair("Capped runs", capText, `${retainedText}. ${quality.scopeNote || ""}`.trim()),
-      pair("Corrected-run source", metadata.source || "Not available")
+    ["Experiment set-up", [
+      pair("Agents per virtual experiment", `${number(initial.datasetMinimumAgents)}–${number(initial.datasetMaximumAgents)}`),
+      pair("Simulation runs", retainedText),
     ]]
   ]);
 
   const timeStepHours = Number.isFinite(physics.simulationStepHours) ? `${number(physics.simulationStepHours)} h` : "1 h (full simulator configuration)";
   fillDetails(document.querySelector("#transport-model-info"), [
-    ["Full ORBIO field solver", [
+    ["Field solver", [
       pair("Equation", "D∇²c − kc = 0"),
-      pair("Method", `Quasi-steady finite difference · ${fieldIterations}`),
-      pair("Corrected-run grid", grid),
+      pair("Method", "Quasi-steady finite difference"),
+      pair("Field grid", grid),
       pair("O₂ / glucose diffusivity", physics.d_o2 && physics.d_glc
         ? `${number(physics.d_o2)} / ${number(physics.d_glc)} µm²/h` : "See repository run metadata")
-    ]],
-    ["Display", [
-      pair("Depletion-shell display cap", "0.55 scene radii")
     ]]
   ]);
 
@@ -108,18 +99,14 @@ export function renderModelDetails(metadata, omicsData) {
       pair("Source", "Reduced mechanistic model (browser, forward steps)"),
       pair("Time window", "Day 0–7"),
       pair("Conditions", "Five gravity trajectories for the selected tissue and morphology"),
-      pair("Full-run dataset initialisation", `${number(initial.datasetMinimumAgents)}–${number(initial.datasetMaximumAgents)} agents per virtual experiment`),
+      pair("Agents per virtual experiment", `${number(initial.datasetMinimumAgents)}–${number(initial.datasetMaximumAgents)}`),
       pair("Population ceiling", `${number(profile.max_agents)} agents in the full simulator`),
-      pair("Population meaning", "The browser’s estimated biological-cell count is distinct from full-simulator agents and rendered glyphs")
     ]]
   ]);
 
   fillDetails(document.querySelector("#cell-state-info"), [
     ["State model", [
       pair("Classes", "Proliferating · Quiescent · Apoptotic · Necrotic"),
-      pair("Full simulator update", timeStepHours),
-      pair("Browser model", "Forward reduced-model steps with continuous interpolation between sampled states"),
-      pair("Browser step", "0.1 day (2.4 h); 71 samples across Day 0–7")
     ]],
     ["Full-simulator thresholds", [
       pair("O₂ proliferation", Number.isFinite(physics.o2Hypoxic) && Number.isFinite(physics.o2ProliferationSaturation)
@@ -143,12 +130,10 @@ export function renderModelDetails(metadata, omicsData) {
     ? `Neural flight proliferation Δ ${number(neuralProliferation.delta, 2)} ± ${number(neuralProliferation.sd, 2)} bootstrap SD (n=${number(neuralProliferation.n)} pairs); the neural prior in the reduced model uses a 0.9109 multiplier.`
     : "No neural flight proliferation contrast is available.";
   fillDetails(document.querySelector("#omics-model-info"), [
-    ["Dataset and interpretation", [
+    ["Dataset", [
       pair("Data", "NASA OSD RNA-seq processed into ORBIO programme scores"),
       pair("Programmes", "Proliferation · apoptosis · anti-apoptosis · hypoxia · glycolysis · adhesion · OXPHOS"),
       pair("Uncertainty", "Reported SD for available measured contrasts"),
-      pair("Calibration rule", "Condition-level signals with a clear direction set the reduced-model priors"),
-      pair("Verified example", neuralExample)
     ]]
   ]);
 
@@ -163,9 +148,9 @@ export function renderModelDetails(metadata, omicsData) {
 export function renderHeroContext(state, visibleGlyphCount) {
   if (!state) return;
   const initialCount = state.population.initialBiologicalCells;
-  document.querySelector("#hero-initial-population").textContent = `~${number(initialCount)} estimated biological cells at D0`;
+  document.querySelector("#hero-initial-population").textContent = `~${number(initialCount)} estimated cells at Day 0`;
   document.querySelector("#hero-rendered-glyphs").textContent =
-    `${number(visibleGlyphCount ?? state.population.renderedParticles)} representative glyphs visible of ${number(state.population.renderedParticles)}`;
-  document.querySelector("#hero-simulation-agents").textContent = `~${number(state.population.simulationAgents)} coarse-grained simulation agents`;
-  document.querySelector("#hero-timestep").textContent = `Reduced-model step: ${number(state.time.stepDays, 1)} day; 7-day timeline`;
+    `${number(visibleGlyphCount ?? state.population.renderedParticles)} of ${number(state.population.renderedParticles)} cell markers shown in 3D`;
+  document.querySelector("#hero-simulation-agents").textContent = `~${number(state.population.simulationAgents)} simulation agents`;
+  document.querySelector("#hero-timestep").textContent = "7-day timeline";
 }

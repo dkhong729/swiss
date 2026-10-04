@@ -1,4 +1,4 @@
-const SVG_NS = "http://www.w3.org/2000/svg";
+﻿const SVG_NS = "http://www.w3.org/2000/svg";
 
 function mixHex(low, high, amount) {
   const parse = (hex) => [1, 3, 5].map((offset) => Number.parseInt(hex.slice(offset, offset + 2), 16));
@@ -26,7 +26,7 @@ export function renderMicroenvironment(state, activeFields) {
   document.querySelector("#spatial-hypoxia").textContent = `${Math.round(transport.hypoxicFraction * 100)}%`;
   const fullRunProfile = window.ORBIO_RUN_METADATA?.profile || {};
   document.querySelector("#spatial-voxel").textContent = Number.isFinite(fullRunProfile.grid_n) && Number.isFinite(fullRunProfile.grid_h)
-    ? `${fullRunProfile.grid_n}³ · ${fullRunProfile.grid_h} µm voxel (full run)`
+    ? `${fullRunProfile.grid_n}³ · ${fullRunProfile.grid_h} µm voxel`
     : "Not available";
   document.querySelector("#spatial-residual-g").textContent = transport.residualG < 0.01
     ? `${transport.residualG.toExponential(0)} g`
@@ -37,9 +37,6 @@ export function renderMicroenvironment(state, activeFields) {
   document.querySelector("#transport-regime-note").textContent = transport.sedimented
     ? "Sedimented lower contact plane is active in this condition."
     : "Suspended condition: medium surrounds the organoid and mixing dominates transport.";
-  document.querySelector("#hero-field-note").textContent = activeFields.glucose
-    ? "O₂ + glucose overlays are enabled in the unified 3D scene."
-    : "O₂ transport is enabled in the unified 3D scene.";
 
   const profile = transport.radialProfile;
   const svg = document.querySelector("#transport-profile");

@@ -1,4 +1,4 @@
-const CELL_COLORS = {
+﻿const CELL_COLORS = {
   proliferating: "#367f9d",
   quiescent: "#6c9291",
   apoptotic: "#ad7b70",
@@ -149,6 +149,7 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
   let pool = null;
   let poolKey = "";
   let cameraDistance = 0;
+  let fitState = null;
   let cameraFov = FOV_FULL;
   let displayRadius = 1;
   let lastCanvasSize = { width: 0, height: 0 };
@@ -164,7 +165,7 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
   }
 
   function computeFit(state) {
-    const units = geometryUnits(state);
+    const units = geometryUnits(fitState || state);
     const extent = units.radius * (1 + units.aniso * 0.45);
     let bound = extent;
     const isSection = cutMode === "cross";
@@ -512,6 +513,9 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
   requestAnimationFrame(frame);
 
   return {
+    setFitState(state) {
+      fitState = state;
+    },
     setState(nextState, nextMorphology) {
       targetState = nextState;
       if (!currentState) currentState = structuredClone(nextState);
