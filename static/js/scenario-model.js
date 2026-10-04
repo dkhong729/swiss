@@ -379,7 +379,7 @@ function buildState(gravity, tissue, morphology, timeIndex, counts, evidence, pe
       necrotic: fractions[3]
     },
     phenotype: {
-      growthFromDay0: biologicalCells / INITIAL_BIOLOGICAL_CELLS,
+      growthFromDay0: (counts.proliferating + counts.quiescent) / (INITIAL_COUNTS.proliferating + INITIAL_COUNTS.quiescent),
       viableCellVolumeFromDay0: (counts.proliferating + counts.quiescent) / (INITIAL_COUNTS.proliferating + INITIAL_COUNTS.quiescent),
       gravityEffectVs1g: 1
     },
@@ -485,7 +485,7 @@ export function growthStats(trajectory) {
   return {
     logFoldDay1ToDay7: logFold,
     foldDay1ToDay7: Math.exp(logFold),
-    populationGrowthDay0ToDay7: last.population.biologicalCells / INITIAL_BIOLOGICAL_CELLS,
+    populationGrowthDay0ToDay7: viable(last),
     viableVolumeGrowthDay0ToDay7: viable(last)
   };
 }

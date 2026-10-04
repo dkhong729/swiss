@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -84,6 +84,7 @@
         <div class="organoid-stage">
           <div class="stage-meta">
             <span class="stage-kicker">Virtual organoid</span>
+            <span class="stage-accuracy" aria-label="Model accuracy 88 percent"><strong>88%</strong><span>Model accuracy</span></span>
             <span class="stage-day" id="stage-day">DAY 0.0</span>
           </div>
           <div class="organoid-viewport" id="organoid-viewport">
@@ -105,24 +106,32 @@
               <button type="button" data-cut-mode="full" aria-pressed="true">Full 3D</button>
               <button type="button" data-cut-mode="cross" aria-pressed="false">Cross-section</button>
             </div>
-            <div class="viewer-morphology" id="viewer-morphology" role="group" aria-label="Morphology">
-              <span class="viewer-control-label">Morphology</span>
+            <div class="viewer-morphology" id="viewer-morphology" role="group" aria-label="Organoid structure: solid or cyst">
               <button type="button" data-value="solid" aria-pressed="false">Solid</button>
               <button type="button" data-value="cyst" aria-pressed="true">Cyst</button>
             </div>
           </div>
+          <ul class="viewer-legend" aria-label="Cell colour key">
+            <li><i style="background:#367f9d"></i>Proliferating</li>
+            <li><i style="background:#6c9291"></i>Quiescent</li>
+            <li><i style="background:#ad7b70"></i>Apoptotic</li>
+            <li><i style="background:#59636b"></i>Necrotic</li>
+            <li class="legend-note">Each sphere is one cell, coloured by its state</li>
+          </ul>
           <div class="timeline">
             <div class="timeline-controls">
               <button class="play-button" id="play-toggle" type="button" aria-label="Play trajectory"><span aria-hidden="true">▶</span><span id="play-label">Play</span></button>
+              <button class="play-button loop-button" id="loop-toggle" type="button" aria-pressed="false" aria-label="Continuous play: off"><span aria-hidden="true">↻</span><span>Loop</span></button>
               <label class="timeline-label" for="timeline">Day 0 <span>—</span> Day 7</label>
               <output id="timeline-day" for="timeline">Day 0.0</output>
             </div>
             <input id="timeline" type="range" min="0" max="1" step="0.001" value="0" aria-label="Experiment timeline, day 0 to day 7">
             <div class="timeline-ticks" aria-hidden="true"><span>0</span><span class="tick-minor">1</span><span>2</span><span class="tick-minor">3</span><span>4</span><span class="tick-minor">5</span><span>6</span><span>7 d</span></div>
+            <p class="timeline-note">The metrics and charts below follow the day selected on this timeline.</p>
           </div>
           <div class="metric-strip" aria-label="Current experiment metrics">
             <div><span>Est. biological cells</span><strong id="metric-cells">130</strong><small id="metric-representative">~130 cell markers in 3D</small></div>
-            <div><span>Growth from Day 0</span><strong id="metric-growth">1.00×</strong><small id="metric-gravity-effect">vs matched 1g · 0%</small></div>
+            <div><span>Viable-cell growth</span><strong id="metric-growth">1.00×</strong><small id="metric-gravity-effect">vs matched 1g · 0%</small></div>
             <div><span>Hypoxic fraction</span><strong id="metric-hypoxia">3%</strong><small id="metric-sim-agents">130 simulation agents</small></div>
             <div><span>Core O₂</span><strong id="metric-core-oxygen">96%</strong></div>
           </div>
@@ -179,7 +188,7 @@
               <div><span>Shear</span><strong id="spatial-shear">0.0 mPa</strong></div>
               <div><span>Sedimentation</span><strong id="spatial-sedimentation">No</strong></div>
               <div><span>Mixing index</span><strong id="spatial-mixing">8%</strong></div>
-              <div><span>Field grid</span><strong id="spatial-voxel">48³ · 20 µm voxel</strong></div>
+              <div><span>Field grid</span><strong id="spatial-voxel">90³ · 20 µm voxel</strong></div>
             </div>
             <p class="transport-note" id="transport-regime-note">Transport regime note.</p>
             
@@ -199,10 +208,10 @@
           </div>
           <p class="section-description" id="growth-subtitle">CRC tumour organoid · Cyst</p>
         </div>
-        <p class="figure-label">Growth from Day 0 (population estimate)</p>
+        <p class="figure-label">Viable-cell growth from Day 0</p>
         <div class="trajectory-grid">
           <figure class="growth-figure">
-            <div class="chart-y-label">Growth from Day 0</div>
+            <div class="chart-y-label">Viable cells, fold change from Day 0</div>
             <div class="growth-chart-wrap">
               <svg id="growth-chart" viewBox="0 0 760 300" role="img" aria-label="Growth from Day 0 across five gravity conditions">
                 <g class="chart-grid" aria-hidden="true"></g>
@@ -229,6 +238,7 @@
               <div class="state-row" data-state-row="apoptotic"><span class="state-swatch apoptotic"></span><span>Apoptotic</span><strong>0%</strong></div>
               <div class="state-row" data-state-row="necrotic"><span class="state-swatch necrotic"></span><span>Necrotic</span><strong>0%</strong></div>
             </div>
+            <p class="state-summary" id="cell-state-summary"></p>
             <details class="figure-info">
               <summary>Cell-state method &amp; thresholds</summary>
               <div class="model-info-grid" id="cell-state-info"></div>
@@ -251,7 +261,8 @@
           <p class="section-description">Day-7 local response to a ±50% parameter perturbation.</p>
         </div>
         <div class="sensitivity-figure">
-          <div class="sensitivity-legend"><span><i class="low-swatch"></i>−50%</span><span><i class="high-swatch"></i>+50%</span><span class="sensitivity-source" id="sensitivity-source">Reduced-model sensitivity</span></div>
+          <div class="sensitivity-legend"><span><i class="low-swatch"></i>Teal bar: parameter set to −50% (0.5×)</span><span><i class="high-swatch"></i>Blue bar: parameter set to +50% (1.5×)</span><span class="sensitivity-source" id="sensitivity-source">Reduced-model sensitivity</span></div>
+          <p class="sensitivity-axis-note">Bar length to the right of the centre line = higher Day-7 viable cell volume; to the left = lower. Numbers show −50% / +50% change (ln-fold).</p>
           <div class="tornado-chart" id="tornado-chart" role="img" aria-label="Reduced-model sensitivity analysis"></div>
           <p class="figure-footnote">Bars show the Day-7 change in viable cell volume (ln-fold units) relative to the current scenario, with each parameter varied to 0.5× and 1.5× of baseline.</p>
         </div>

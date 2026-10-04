@@ -80,6 +80,13 @@ export function createInterface(onScenarioChange, onTimeChange, onPlaybackChange
   drawerPanel.inert = true;
   timeline.addEventListener("input", () => onTimeChange(Number(timeline.value)));
   playButton.addEventListener("click", () => onPlaybackChange());
+  const loopButton = document.querySelector("#loop-toggle");
+  let loopEnabled = false;
+  loopButton.addEventListener("click", () => {
+    loopEnabled = !loopEnabled;
+    loopButton.setAttribute("aria-pressed", String(loopEnabled));
+    loopButton.setAttribute("aria-label", `Continuous play: ${loopEnabled ? "on" : "off"}`);
+  });
 
   layerButtons.forEach((button) => button.addEventListener("click", () => {
     const key = button.dataset.layer;
@@ -96,6 +103,7 @@ export function createInterface(onScenarioChange, onTimeChange, onPlaybackChange
   updateScenarioLabels();
 
   return {
+    isLoop: () => loopEnabled,
     setTime: (time) => { timeline.value = String(time); },
     setPlayback: (playing) => {
       playLabel.textContent = playing ? "Pause" : "Play";

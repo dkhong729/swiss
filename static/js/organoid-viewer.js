@@ -1,4 +1,4 @@
-﻿import { radialFieldAt } from "./scenario-model.js";
+import { radialFieldAt } from "./scenario-model.js";
 
 const CELL_COLORS = {
   proliferating: "#367f9d",
@@ -9,6 +9,7 @@ const CELL_COLORS = {
 const PARTICLE_CAPACITY = 1000;
 const FOUNDER_COUNT = 130;
 const REFERENCE_RADIUS_UM = 70;
+const SECTION_FILL = 1.32;
 const FOV_FULL = 34;
 const FOV_SECTION = 18;
 const FIT_MARGIN = 1.25;
@@ -299,7 +300,7 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
     if (spacingCache.key === key) return spacingCache;
     const unit = { radius: 1, inner };
     const base = baseCellRadius(unit, count, state);
-    const half = base * 1.35;
+    const half = base * 1.9;
     const point = { x: 0, y: 0, z: 0 };
     const xs = new Float32Array(count);
     const ys = new Float32Array(count);
@@ -375,7 +376,7 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
         self.z = mother.z + (self.z - mother.z) * e;
         birth = 0.55 + 0.45 * e;
       }
-      const sectionFactor = section ? Math.sqrt(Math.max(0.6, 1 - (self.z / sectionHalf) ** 2 * 0.4)) : 1;
+      const sectionFactor = section ? Math.sqrt(Math.max(0.75, 1 - (self.z / sectionHalf) ** 2 * 0.25)) : 1;
       callback(k, self, fate, spacing.radius[k] * units.radius, birth, sectionFactor, units);
       emitted += 1;
     }
@@ -437,7 +438,7 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
         if (fields && field.region !== 'bulk') {
           fieldColor(field, tint);
           const hex = tint.getHex();
-          const mix = field.region === 'tissue' ? 0.7 : field.region === 'lumen' ? 0.35 : 0.55;
+          const mix = field.region === 'tissue' ? (layers.cells ? 0.3 : 0.7) : field.region === 'lumen' ? 0.35 : 0.55;
           const c = [(hex >> 16) & 255, (hex >> 8) & 255, hex & 255];
           rgb = (rgb || tissue).map((v, i) => v + (c[i] - v) * mix);
           alpha = Math.max(alpha, field.region === 'depletion' ? 0.6 : alpha);
@@ -501,18 +502,19 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
     const radialDirection = new THREE.Vector3();
     let slot = 0;
     const fieldTint = new THREE.Color();
-    const tintAmount = section ? 0.5 : 0;
+    const tintAmount = section ? 0.3 : 0;
     visibleCount = collectVisible(state, (k, p, fate, cr, birth, sectionFactor, cellUnits) => {
       const phase = (now / 1650 + pool.seed[k] * 3) % 1;
       const pulse = fate === "proliferating" ? clamp((phase - 0.8) / 0.2, 0, 1) * 0.1 : 0;
       let size = cr * (0.96 + pool.seed[k] * 0.1) * birth * (1 + pulse);
-      if (fate === "apoptotic") size *= 0.62;
+      if (fate === "apoptotic") size *= section ? 0.88 : 0.62;
       else if (fate === "necrotic") size *= 0.9;
       else if (fate === "quiescent") size *= 0.97;
       position.set(p.x, p.y, p.z);
       if (section) {
         quaternion.identity();
-        scale.set(size * sectionFactor, size * sectionFactor, size * 0.28);
+        const flat = size * sectionFactor * SECTION_FILL;
+        scale.set(flat, flat, size * 0.28);
       } else {
         const len = Math.max(1e-5, Math.hypot(p.x, p.y, p.z));
         radialDirection.set(p.x / len, p.y / len, p.z / len);

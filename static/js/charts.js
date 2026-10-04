@@ -151,6 +151,10 @@ export function renderCellStates(root, state) {
   const summary = CELL_STATE_KEYS.map((key, index) => `${key} ${percentages[index]}%`).join(", ");
   root.querySelector("#stacked-bar").setAttribute("aria-label", `Cell-state composition: ${summary}`);
   root.querySelector("#cell-state-day").textContent = state.time.day.toFixed(1);
+  const { proliferatingCount, quiescentCount, apoptoticCount, necroticCount, biologicalCells } = state.population;
+  const viable = proliferatingCount + quiescentCount;
+  const nonViable = Math.round(100 * (apoptoticCount + necroticCount) / biologicalCells);
+  root.querySelector("#cell-state-summary").textContent = `Viable cells ${Math.round(viable).toLocaleString("en-US")} of ${Math.round(biologicalCells).toLocaleString("en-US")} (${state.phenotype.growthFromDay0.toFixed(1)}× Day 0); apoptotic + necrotic ${nonViable}%.`;
 }
 
 function divergingBar(track, value, className, maxMagnitude) {
@@ -189,7 +193,7 @@ export function renderSensitivity(root, sensitivity) {
     name.textContent = label;
     const track = document.createElement("span");
     track.className = "tornado-track";
-    track.setAttribute("aria-label", `${label}: minus 50 percent ${low.toFixed(2)}, plus 50 percent ${high.toFixed(2)} log growth change`);
+    track.setAttribute("aria-label", `${label}: parameter at 0.5 times baseline ${low.toFixed(2)}, at 1.5 times baseline ${high.toFixed(2)} log growth change`);
     const zero = document.createElement("i");
     zero.className = "tornado-zero";
     track.appendChild(zero);
@@ -203,13 +207,13 @@ export function renderSensitivity(root, sensitivity) {
   });
 }
 
-function buildOmicsAxes(svg, range) {
+function buildOmicsAxes(svg, range, width) {
   const grid = svg.querySelector(".omics-grid");
   const labels = svg.querySelector(".omics-labels");
   grid.replaceChildren();
   labels.replaceChildren();
   const left = 215;
-  const right = 720;
+  const right = width - 40;
   const top = 25;
   const bottom = 336;
   const xAt = (value) => left + ((value + range) / (2 * range)) * (right - left);
@@ -226,7 +230,9 @@ function buildOmicsAxes(svg, range) {
 
 export function renderMolecularEvidence(svg, state) {
   const range = 1.05;
-  const scales = buildOmicsAxes(svg, range);
+  const width = Math.max(760, Math.round(svg.parentElement.clientWidth));
+  svg.setAttribute("viewBox", `0 0 ${width} 370`);
+  const scales = buildOmicsAxes(svg, range, width);
   const bars = svg.querySelector(".omics-bars");
   bars.replaceChildren();
   const scores = state.molecularEvidence;

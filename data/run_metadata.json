@@ -3,9 +3,9 @@
   "source": "outputs/pipeline_corrected_v2/summary.json",
   "profile": {
     "name": "rtx5070ti",
-    "grid_n": 48,
+    "grid_n": 90,
     "grid_h": 20.0,
-    "max_agents": 5000,
+    "max_agents": 90000,
     "pair_chunk": 4096,
     "n_scenarios": 480,
     "workers": 4,
@@ -212,7 +212,7 @@
             -2.245426713015699,
             -2.245426713015699
           ],
-          "tissue µg proliferation mult.": [
+          "tissue 繕g proliferation mult.": [
             -2.245426713015699,
             -2.245426713015699
           ],
@@ -250,7 +250,7 @@
             -2.3328904300974282,
             -2.3328904300974282
           ],
-          "tissue µg proliferation mult.": [
+          "tissue 繕g proliferation mult.": [
             -6.907755278982137,
             -0.15333410215602622
           ],

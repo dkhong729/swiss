@@ -99,7 +99,7 @@ function renderGrowthSummary() {
   const note = document.querySelector("#growth-stats-note");
   const gravityLabel = GRAVITY_OPTIONS.find(({ value }) => value === scenario.gravity).label;
   const fold = (logFold) => `${Math.exp(logFold).toFixed(1)}×`;
-  let text = `${gravityLabel}: population ${stats.populationGrowthDay0ToDay7.toFixed(1)}× from Day 0 to Day 7; viable volume ${fold(stats.logFoldDay1ToDay7)} from Day 1 to Day 7.`;
+  let text = `${gravityLabel}: viable cells ${stats.populationGrowthDay0ToDay7.toFixed(1)}× from Day 0 to Day 7 (${fold(stats.logFoldDay1ToDay7)} from Day 1 to Day 7); apoptotic and necrotic cells are excluded.`;
   const reference = runMetadata.faceValidity?.byTissueAndGravity?.[scenario.tissue]?.[scenario.gravity];
   if (reference && reference.n > 0) {
     text += ` ORBIO pipeline reference for this condition: ${fold(reference.median_log_fold)} (median of ${reference.n} runs).`;
@@ -166,9 +166,15 @@ function advancePlayback(timestamp) {
     renderDynamicState();
   }
   if (currentTime >= 1) {
-    playing = false;
-    ui.setPlayback(false);
-    return;
+    if (ui.isLoop()) {
+      currentTime = 0;
+      previousFrameTime = 0;
+      renderDynamicState();
+    } else {
+      playing = false;
+      ui.setPlayback(false);
+      return;
+    }
   }
   playbackFrame = requestAnimationFrame(advancePlayback);
 }
@@ -184,6 +190,15 @@ new ResizeObserver(() => {
     updateGravityMarkers(growthChart, trajectories, currentTime);
   }, 80);
 }).observe(growthChart.parentElement);
+
+const omicsChart = document.querySelector("#omics-chart");
+let omicsWidth = 0;
+new ResizeObserver(() => {
+  const width = Math.round(omicsChart.parentElement.clientWidth);
+  if (!currentState || !width || width === omicsWidth) return;
+  omicsWidth = width;
+  renderMolecularEvidence(omicsChart, currentState);
+}).observe(omicsChart.parentElement);
 
 window.addEventListener("pagehide", () => {
   if (playing) cancelAnimationFrame(playbackFrame);
