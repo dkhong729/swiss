@@ -147,29 +147,19 @@
         <div class="spatial-layout">
           <div class="cross-section-panel">
             <div class="cross-section-meta">
-              <span>Radial transport profile (bulk → depletion layer → tissue)</span>
+              <span>Radial transport profile (centre → tissue → depletion layer → bulk)</span>
               <span id="transport-day">DAY 0.0</span>
             </div>
-            <div class="chart-scroll"><svg id="transport-profile" viewBox="0 0 760 300" role="img" aria-label="Radial O2 and glucose profile from bulk medium to organoid core">
-              <g class="chart-grid" aria-hidden="true">
-                <line x1="62" y1="255" x2="738" y2="255"></line>
-                <line x1="62" y1="22" x2="62" y2="255"></line>
-                <line x1="62" y1="197" x2="738" y2="197"></line>
-                <line x1="62" y1="140" x2="738" y2="140"></line>
-                <line x1="62" y1="82" x2="738" y2="82"></line>
-                <line x1="62" y1="22" x2="738" y2="22"></line>
-              </g>
-              <line id="profile-midline" class="chart-marker-line" x1="430" y1="20" x2="430" y2="258"></line>
-              <line id="profile-shell-end" class="chart-marker-line" x1="602" y1="20" x2="602" y2="258"></line>
-              <path id="profile-oxygen" class="profile-line oxygen" d=""></path>
-              <path id="profile-glucose" class="profile-line glucose" d=""></path>
-              <circle id="core-indicator" cx="706" cy="48" r="10"></circle>
-              <text x="62" y="279" class="cross-section-label">Bulk medium</text>
-              <text x="370" y="279" class="cross-section-label">Depletion layer</text>
-              <text x="618" y="279" class="cross-section-label">Tissue interior</text>
-              <text id="profile-o2-depletion" x="76" y="44" class="cross-section-label">ΔO₂ bulk→surface</text>
-              <text id="profile-regime" x="76" y="68" class="cross-section-label">δ/R · ΦO₂</text>
-            </svg></div>
+            <div class="chart-scroll"><svg id="transport-profile" viewBox="0 0 760 360" role="img" aria-label="Radial O2 and glucose profile versus distance from the organoid centre, with tissue, depletion layer and bulk medium regions">
+               <g id="profile-layer" aria-hidden="true"></g>
+               <g id="profile-grid" class="chart-grid" aria-hidden="true"></g>
+               <line id="profile-midline" class="chart-marker-line" x1="0" y1="0" x2="0" y2="0"></line>
+               <line id="profile-shell-end" class="chart-marker-line" x1="0" y1="0" x2="0" y2="0"></line>
+               <path id="profile-oxygen" class="profile-line oxygen" d=""></path>
+               <path id="profile-glucose" class="profile-line glucose" d=""></path>
+               <text id="profile-surface-label" class="profile-edge-label" text-anchor="end"></text>
+               <text id="profile-edge-label" class="profile-edge-label" text-anchor="start"></text>
+             </svg></div>
             <p class="source-line" id="transport-source">SOURCE · Reduced mechanistic model</p>
             <p class="figure-footnote" id="profile-lumen-note"></p>
           </div>

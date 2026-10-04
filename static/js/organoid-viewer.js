@@ -1,4 +1,6 @@
-﻿const CELL_COLORS = {
+﻿import { radialFieldAt } from "./scenario-model.js";
+
+const CELL_COLORS = {
   proliferating: "#367f9d",
   quiescent: "#6c9291",
   apoptotic: "#ad7b70",
@@ -10,6 +12,9 @@ const REFERENCE_RADIUS_UM = 70;
 const FOV_FULL = 34;
 const FOV_SECTION = 18;
 const FIT_MARGIN = 1.25;
+const VISUAL_NN_RATIO = 0.59;
+const MAX_RADIUS_GAIN = 1.7;
+const NICE_SCALES_UM = [5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000];
 const BIRTH_EASE_CELLS = 28;
 const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
 
@@ -154,13 +159,32 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
   let displayRadius = 1;
   let lastCanvasSize = { width: 0, height: 0 };
   let visibleCount = 0;
+  const spacingCache = { key: '' };
+  let sectionDisc = null;
+  let sectionCanvas = null;
+  let sectionTexture = null;
+  let sectionKey = '';
+  let sectionDrawnAt = 0;
+  let glucoseLow = null;
+  let glucoseHigh = null;
+  let fieldMix = null;
+  let scaleInfo = { pxPerUm: 0, label: '' };
+  let scaleKey = '';
+  const scaleEl = document.createElement('div');
+  scaleEl.className = 'viewer-scale';
+  scaleEl.innerHTML = '<div class="viewer-scale-bar"><span class="viewer-scale-line"></span><span class="viewer-scale-label"></span></div><div class="viewer-scale-meta"><span class="scale-diameter"></span><span class="scale-boundary"></span></div>';
+  canvas.parentElement.append(scaleEl);
+  const scaleLine = scaleEl.querySelector('.viewer-scale-line');
+  const scaleLabel = scaleEl.querySelector('.viewer-scale-label');
+  const scaleDiameter = scaleEl.querySelector('.scale-diameter');
+  const scaleBoundary = scaleEl.querySelector('.scale-boundary');
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
   function geometryUnits(state) {
     const radius = state.geometry.radiusUm / REFERENCE_RADIUS_UM;
     const lumen = state.geometry.lumenRadiusUm / REFERENCE_RADIUS_UM;
     const inner = state.geometry.morphology === "cyst" ? clamp(lumen / Math.max(radius, 1e-6), 0, 0.95) : 0;
-    const layerRatio = clamp(state.transport.boundaryLayerUm / Math.max(1, state.geometry.radiusUm), 0.025, 0.55);
+    const layerRatio = Math.max(0.025, state.transport.boundaryLayerUm / Math.max(1, state.geometry.radiusUm));
     return { radius, inner, layerRatio, aniso: state.geometry.anisotropy };
   }
 
@@ -169,7 +193,7 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
     const extent = units.radius * (1 + units.aniso * 0.45);
     let bound = extent;
     const isSection = cutMode === "cross";
-    if (!isSection && layers.depletion) bound = Math.max(bound, extent * (1 + units.layerRatio));
+    if (layers.depletion || (isSection && (layers.oxygen || layers.glucose))) bound = Math.max(bound, extent * (1 + units.layerRatio));
     if (!isSection && layers.voxels && !layers.cells) bound = Math.max(bound, extent * 1.15);
     const fov = isSection ? FOV_SECTION : FOV_FULL;
     const aspect = lastCanvasSize.width > 0 ? lastCanvasSize.width / Math.max(1, lastCanvasSize.height) : 1;
@@ -190,6 +214,10 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
     glucoseShell.visible = layers.glucose && full;
     floorPlane.visible = full && Boolean(currentState?.transport.sedimented);
     voxelGrid.visible = layers.voxels;
+    if (sectionDisc) {
+      sectionDisc.visible = !full && (layers.cells || layers.oxygen || layers.glucose || layers.depletion);
+      sectionKey = "";
+    }
   }
 
   function makeIrregularSurface(tissue, anisotropy) {
@@ -225,55 +253,214 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
     }
   }
 
+  // Number of dense radial layers in a cyst shell, from shell thickness / visual cell diameter.
+  function shellLayers(units, count) {
+    if (pool?.morphology !== "cyst") return 1;
+    const shellFraction = Math.max(0.06, 1 - units.inner ** 3);
+    const cellRadius = Math.cbrt((0.7 * shellFraction) / Math.max(FOUNDER_COUNT, count));
+    return clamp(Math.round((1 - units.inner) / (2 * cellRadius * 0.8)), 2, 4);
+  }
+
   // Position of agent k in organoid-local units at the current radius / lumen size.
-  function agentPosition(k, units, out) {
+  function agentPosition(k, units, out, layerCount = 1) {
     const d = pool.direction;
-    const r = pool.radial[k];
-    const scale = pool.morphology === "cyst"
-      ? units.radius * (units.inner + (1 - units.inner) * r)
-      : units.radius * r;
+    let scale;
+    if (pool.morphology === "cyst") {
+      const layer = (k % layerCount + 0.5 + (pool.seed[k] - 0.5) * 0.3) / layerCount;
+      scale = units.radius * (units.inner + (1 - units.inner) * clamp(layer, 0.02, 0.98));
+    } else {
+      scale = units.radius * pool.radial[k];
+    }
     out.x = d[k * 3] * scale;
     out.y = d[k * 3 + 1] * scale;
     out.z = d[k * 3 + 2] * scale;
     return out;
   }
 
-  function cellRadiusFor(units, count, state) {
+  function baseCellRadius(units, count, state) {
     const tissueFraction = pool.morphology === "cyst" ? Math.max(0.06, 1 - units.inner ** 3) : 1;
     const packing = clamp(state.geometry.packingFraction || 0.7, 0.64, 0.78);
     return units.radius * Math.cbrt((packing * tissueFraction) / Math.max(FOUNDER_COUNT, count)) * 1.05;
   }
 
+  /*
+   * Visual radius per rendered cell: proportional to the distance to its nearest rendered
+   * neighbour (centre spacing = 1 / (2 * VISUAL_NN_RATIO) visual radii, about 1.6), so neighbours
+   * touch and slightly overlap and the tissue reads as confluent. This is rendering geometry only;
+   * the biological cell radius used by the model is untouched. Computed once in unit-radius
+   * space and cached; in cross-section the neighbour search runs in the section plane.
+   */
+  function neighbourSpacing(units, count, state, section) {
+    const layerCount = shellLayers(units, count);
+    const inner = Math.round(units.inner * 50) / 50;
+    const key = `${poolKey}|${count}|${inner}|${layerCount}|${section ? 1 : 0}`;
+    if (spacingCache.key === key) return spacingCache;
+    const unit = { radius: 1, inner };
+    const base = baseCellRadius(unit, count, state);
+    const half = base * 1.35;
+    const point = { x: 0, y: 0, z: 0 };
+    const xs = new Float32Array(count);
+    const ys = new Float32Array(count);
+    const zs = new Float32Array(count);
+    const members = [];
+    for (let k = 0; k < count; k += 1) {
+      agentPosition(k, unit, point, layerCount);
+      xs[k] = point.x; ys[k] = point.y; zs[k] = point.z;
+      if (!section || Math.abs(point.z) <= half) members.push(k);
+    }
+    const nearest = new Float32Array(count).fill(Infinity);
+    for (let a = 0; a < members.length; a += 1) {
+      const i = members[a];
+      for (let b = a + 1; b < members.length; b += 1) {
+        const j = members[b];
+        const dx = xs[i] - xs[j];
+        const dy = ys[i] - ys[j];
+        const dz = section ? 0 : zs[i] - zs[j];
+        const dist = dx * dx + dy * dy + dz * dz;
+        if (dist < nearest[i] * nearest[i]) nearest[i] = Math.sqrt(dist);
+        if (dist < nearest[j] * nearest[j]) nearest[j] = Math.sqrt(dist);
+      }
+    }
+    const radius = new Float32Array(count);
+    for (let k = 0; k < count; k += 1) {
+      radius[k] = Number.isFinite(nearest[k])
+        ? clamp(nearest[k] * VISUAL_NN_RATIO, base * 0.62, base * MAX_RADIUS_GAIN)
+        : base;
+    }
+    Object.assign(spacingCache, { key, radius, half, base, layerCount, inner });
+    return spacingCache;
+  }
+
   function collectVisible(state, callback) {
     const units = geometryUnits(state);
     const count = clamp(Math.round(state.population.renderedParticles), FOUNDER_COUNT, PARTICLE_CAPACITY);
-    const cr = cellRadiusFor(units, count, state);
+    const section = cutMode === "cross";
+    const spacing = neighbourSpacing(units, count, state, section);
     const self = { x: 0, y: 0, z: 0 };
     const mother = { x: 0, y: 0, z: 0 };
-    const section = cutMode === "cross";
-    const sectionHalf = cr * 1.35;
+    const sectionHalf = spacing.half * units.radius;
     let emitted = 0;
     for (let k = 0; k < count; k += 1) {
-      agentPosition(k, units, self);
+      agentPosition(k, units, self, spacing.layerCount);
       if (section && Math.abs(self.z) > sectionHalf) continue;
       const age = count - k;
       const fate = fateAtDepth(state.cellState, pool.depth[k]);
       let birth = 1;
       if (k >= FOUNDER_COUNT && age < BIRTH_EASE_CELLS && pool.parent[k] >= 0) {
         const e = (age / BIRTH_EASE_CELLS) ** 2 * (3 - 2 * (age / BIRTH_EASE_CELLS));
-        agentPosition(pool.parent[k], units, mother);
+        agentPosition(pool.parent[k], units, mother, spacing.layerCount);
         self.x = mother.x + (self.x - mother.x) * e;
         self.y = mother.y + (self.y - mother.y) * e;
         self.z = mother.z + (self.z - mother.z) * e;
         birth = 0.55 + 0.45 * e;
       }
-      const sectionFactor = section ? Math.sqrt(Math.max(0.1, 1 - (self.z / sectionHalf) ** 2 * 0.6)) : 1;
-      callback(k, self, fate, cr, birth, sectionFactor);
+      const sectionFactor = section ? Math.sqrt(Math.max(0.6, 1 - (self.z / sectionHalf) ** 2 * 0.4)) : 1;
+      callback(k, self, fate, spacing.radius[k] * units.radius, birth, sectionFactor, units);
       emitted += 1;
     }
     return emitted;
   }
+  function fieldColor(field, out) {
+    if (layers.oxygen && layers.glucose) {
+      out.copy(oxygenLow).lerp(oxygenHigh, field.oxygen);
+      fieldMix.copy(glucoseLow).lerp(glucoseHigh, field.glucose);
+      return out.lerp(fieldMix, 0.5);
+    }
+    if (layers.glucose) return out.copy(glucoseLow).lerp(glucoseHigh, field.glucose);
+    return out.copy(oxygenLow).lerp(oxygenHigh, field.oxygen);
+  }
 
+  /*
+   * Cross-section backdrop: one continuous disc that spans the tissue and the depletion layer.
+   * It is painted from the same radial field (radiusUm, lumenRadiusUm, boundaryLayerUm) as the
+   * profile chart, so the tissue reads as a continuous medium rather than a union of glyphs.
+   */
+  function drawSectionField(state, units) {
+    const transport = state.transport;
+    const geometry = state.geometry;
+    const key = [layers.cells, layers.oxygen, layers.glucose, layers.depletion, geometry.morphology,
+      geometry.radiusUm.toFixed(0), geometry.lumenRadiusUm.toFixed(0), transport.boundaryLayerUm.toFixed(0),
+      transport.coreO2.toFixed(2), transport.surfaceO2.toFixed(2), transport.bulkO2.toFixed(2),
+      transport.coreGlucose.toFixed(2), transport.surfaceGlucose.toFixed(2)].join('|');
+    if (key === sectionKey) return;
+    const now = performance.now();
+    if (now - sectionDrawnAt < 120) return;
+    sectionKey = key;
+    sectionDrawnAt = now;
+    const size = sectionCanvas.width;
+    const context = sectionCanvas.getContext('2d');
+    const image = context.createImageData(size, size);
+    const extentUm = geometry.radiusUm + transport.boundaryLayerUm;
+    const fields = layers.oxygen || layers.glucose;
+    const tissue = [207, 224, 226];
+    const tint = new THREE.Color();
+    for (let py = 0; py < size; py += 1) {
+      for (let px = 0; px < size; px += 1) {
+        const nx = ((px + 0.5) / size) * 2 - 1;
+        const ny = ((py + 0.5) / size) * 2 - 1;
+        const rr = Math.hypot(nx, ny);
+        const offset = (py * size + px) * 4;
+        if (rr > 1) continue;
+        const field = radialFieldAt(transport, geometry, rr * extentUm);
+        let rgb = null;
+        let alpha = 0;
+        if (field.region === 'lumen') {
+          rgb = [247, 244, 238]; alpha = 0.92;
+        } else if (field.region === 'tissue') {
+          rgb = tissue; alpha = layers.cells || fields ? 0.96 : 0;
+        } else if (field.region === 'depletion') {
+          rgb = [128, 212, 208]; alpha = layers.depletion ? 0.2 : 0;
+        }
+        if (fields && field.region !== 'bulk') {
+          fieldColor(field, tint);
+          const hex = tint.getHex();
+          const mix = field.region === 'tissue' ? 0.7 : field.region === 'lumen' ? 0.35 : 0.55;
+          const c = [(hex >> 16) & 255, (hex >> 8) & 255, hex & 255];
+          rgb = (rgb || tissue).map((v, i) => v + (c[i] - v) * mix);
+          alpha = Math.max(alpha, field.region === 'depletion' ? 0.6 : alpha);
+        }
+        if (!rgb || alpha <= 0) continue;
+        image.data[offset] = rgb[0]; image.data[offset + 1] = rgb[1]; image.data[offset + 2] = rgb[2];
+        image.data[offset + 3] = Math.round(alpha * 255);
+      }
+    }
+    context.clearRect(0, 0, size, size);
+    context.putImageData(image, 0, 0);
+    if (layers.depletion) {
+      context.strokeStyle = 'rgba(25, 120, 130, 0.75)';
+      context.lineWidth = 2;
+      context.setLineDash([6, 5]);
+      context.beginPath();
+      context.arc(size / 2, size / 2, size / 2 - 2, 0, Math.PI * 2);
+      context.stroke();
+      context.beginPath();
+      context.arc(size / 2, size / 2, (geometry.radiusUm / extentUm) * (size / 2), 0, Math.PI * 2);
+      context.stroke();
+    }
+    sectionTexture.needsUpdate = true;
+  }
+
+  // World-unit to pixel conversion from the live camera: pixels per unit at the organoid centre plane.
+  function updateScaleBar(pxPerUnit) {
+    const state = currentState;
+    if (!state || !(pxPerUnit > 0)) return;
+    const width = renderer ? lastCanvasSize.width : (fallbackCanvas.clientWidth || 640);
+    const pxPerUm = pxPerUnit / REFERENCE_RADIUS_UM;
+    const [minPx, maxPx] = width < 480 ? [60, 110] : width < 900 ? [70, 140] : [80, 180];
+    let pick = NICE_SCALES_UM[0];
+    NICE_SCALES_UM.forEach((value) => { if (value * pxPerUm <= maxPx) pick = value; });
+    const length = Math.max(minPx * 0.5, pick * pxPerUm);
+    const diameter = Math.round(state.geometry.radiusUm * 2);
+    const delta = Math.round(state.transport.boundaryLayerUm);
+    const key = `${pick}|${Math.round(length)}|${diameter}|${delta}`;
+    scaleInfo = { pxPerUm, label: `${pick} µm`, length };
+    if (key === scaleKey) return;
+    scaleKey = key;
+    scaleLine.style.width = `${length.toFixed(1)}px`;
+    scaleLabel.textContent = `${pick} µm`;
+    scaleDiameter.textContent = `Organoid diameter ~${diameter} µm`;
+    scaleBoundary.textContent = `Boundary layer δ = ${delta} µm`;
+  }
   function updateScene(now) {
     if (!cells || !currentState || !pool) return;
     const state = currentState;
@@ -290,7 +477,9 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
     const radialAxis = new THREE.Vector3(0, 1, 0);
     const radialDirection = new THREE.Vector3();
     let slot = 0;
-    visibleCount = collectVisible(state, (k, p, fate, cr, birth, sectionFactor) => {
+    const fieldTint = new THREE.Color();
+    const tintAmount = section ? 0.5 : 0;
+    visibleCount = collectVisible(state, (k, p, fate, cr, birth, sectionFactor, cellUnits) => {
       const phase = (now / 1650 + pool.seed[k] * 3) % 1;
       const pulse = fate === "proliferating" ? clamp((phase - 0.8) / 0.2, 0, 1) * 0.1 : 0;
       let size = cr * (0.96 + pool.seed[k] * 0.1) * birth * (1 + pulse);
@@ -305,12 +494,22 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
         const len = Math.max(1e-5, Math.hypot(p.x, p.y, p.z));
         radialDirection.set(p.x / len, p.y / len, p.z / len);
         quaternion.setFromUnitVectors(radialAxis, radialDirection);
-        scale.set(size, size * 0.98, size);
+        const outerRoom = cellUnits.radius * 1.02 - len;
+        const innerRoom = cellUnits.inner > 0 ? len - cellUnits.radius * cellUnits.inner * 0.98 : Infinity;
+        const radialSize = Math.max(size * 0.55, Math.min(size, outerRoom, innerRoom));
+        const tangential = Math.min(size * 1.35, size * Math.sqrt(size / radialSize));
+        const wobble = 0.9 + 0.2 * pool.seed[(k * 7) % PARTICLE_CAPACITY];
+        scale.set(tangential * wobble, radialSize, tangential / wobble);
       }
       matrix.compose(position, quaternion, scale);
       cells.setMatrixAt(slot, matrix);
       color.copy(colorByFate[fate]);
       if (fate === "apoptotic") color.lerp(apoptoticFade, 0.4);
+      if (tintAmount && (layers.oxygen || layers.glucose)) {
+        const field = radialFieldAt(state.transport, state.geometry, Math.hypot(p.x, p.y, p.z) * REFERENCE_RADIUS_UM);
+        fieldColor(field, fieldTint);
+        color.lerp(fieldTint, tintAmount);
+      }
       cells.setColorAt(slot, color);
       slot += 1;
     });
@@ -332,6 +531,12 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
     floorPlane.position.y = -radius * 1.02;
     floorPlane.scale.setScalar(Math.max(1, radius));
     voxelGrid.scale.setScalar(Math.max(1.2, computeFit(state).bound * 1.1) / 1.2);
+    if (section && sectionDisc) {
+      const spacing = neighbourSpacing(units, clamp(Math.round(state.population.renderedParticles), FOUNDER_COUNT, PARTICLE_CAPACITY), state, true);
+      sectionDisc.scale.setScalar(radius * (1 + units.layerRatio));
+      sectionDisc.position.z = -(spacing.half * radius + 0.02);
+      drawSectionField(state, units);
+    }
     setDisplayMode();
   }
 
@@ -348,6 +553,7 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
     camera.far = cameraDistance + fit.bound * 4;
     camera.lookAt(0, 0, 0);
     camera.updateProjectionMatrix();
+    updateScaleBar((lastCanvasSize.height / 2) / (Math.tan((cameraFov * Math.PI) / 360) * cameraDistance));
   }
 
   function renderFallback(state) {
@@ -368,6 +574,7 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
     const full = cutMode === "full";
     const bound = units.radius * (layers.depletion && full ? 1 + units.layerRatio : 1);
     const pixelsPerUnit = (Math.min(width, height) * 0.42) / Math.max(bound, 1e-6);
+    updateScaleBar(pixelsPerUnit);
     context.save();
     context.translate(width / 2, height / 2);
     if (layers.depletion && full) {
@@ -427,6 +634,9 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
       oxygenLow = new THREE.Color("#d36d5d");
       oxygenHigh = new THREE.Color("#0f79c8");
       oxygenColor = new THREE.Color();
+      glucoseLow = new THREE.Color("#e3b04b");
+      glucoseHigh = new THREE.Color("#3b9d85");
+      fieldMix = new THREE.Color();
       scene = new THREE.Scene();
       camera = new THREE.PerspectiveCamera(FOV_FULL, 1, 0.05, 200);
       scene.add(new THREE.HemisphereLight(0xfbfaf6, 0xc7d7d8, 2.6));
@@ -469,6 +679,15 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
         new THREE.MeshBasicMaterial({ color: 0x102235, transparent: true, opacity: 0.06, side: THREE.DoubleSide }));
       floorPlane.rotation.x = -Math.PI / 2;
       organoid.add(floorPlane);
+      sectionCanvas = document.createElement("canvas");
+      sectionCanvas.width = 192;
+      sectionCanvas.height = 192;
+      sectionTexture = new THREE.CanvasTexture(sectionCanvas);
+      sectionTexture.colorSpace = THREE.SRGBColorSpace;
+      sectionDisc = new THREE.Mesh(new THREE.PlaneGeometry(2, 2),
+        new THREE.MeshBasicMaterial({ map: sectionTexture, transparent: true, depthWrite: false }));
+      sectionDisc.visible = false;
+      organoid.add(sectionDisc);
       voxelGrid = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(2.4, 2.4, 2.4)),
         new THREE.LineBasicMaterial({ color: 0x9ca8b4, transparent: true, opacity: 0.3 }));
       organoid.add(voxelGrid);
@@ -536,7 +755,7 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
       return collectVisible(targetState, () => {});
     },
     debug() {
-      return { cameraDistance, cameraFov, displayRadius, cutMode, visibleCount, renderer: Boolean(renderer) };
+      return { cameraDistance, cameraFov, displayRadius, cutMode, visibleCount, scale: scaleInfo, renderer: Boolean(renderer) };
     },
     dispose() {
       disposed = true;

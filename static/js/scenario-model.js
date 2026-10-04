@@ -215,6 +215,37 @@ function buildRadialProfile(transport) {
   return profile;
 }
 
+/*
+ * Physical radial field. r is the distance from the organoid centre in µm. The same radiusUm,
+ * lumenRadiusUm and boundaryLayerUm drive the 3D scene, the section view and the profile chart.
+ * Regions: lumen (cyst only), tissue, depletion layer (R to R + δ), bulk medium.
+ */
+export function radialFieldAt(transport, geometry, rUm) {
+  const radius = Math.max(1, geometry.radiusUm);
+  const delta = Math.max(1, transport.boundaryLayerUm);
+  const lumen = geometry.morphology === "cyst" ? CLAMP(geometry.lumenRadiusUm, 0, radius * 0.95) : 0;
+  if (rUm <= lumen) {
+    return { region: "lumen", oxygen: transport.coreO2, glucose: transport.coreGlucose };
+  }
+  if (rUm <= radius) {
+    const t = (rUm - lumen) / Math.max(1e-6, radius - lumen);
+    return {
+      region: "tissue",
+      oxygen: transport.coreO2 + (transport.surfaceO2 - transport.coreO2) * (t ** 1.35),
+      glucose: transport.coreGlucose + (transport.surfaceGlucose - transport.coreGlucose) * (t ** 1.3)
+    };
+  }
+  if (rUm <= radius + delta) {
+    const s = (rUm - radius) / delta;
+    return {
+      region: "depletion",
+      oxygen: transport.surfaceO2 + (transport.bulkO2 - transport.surfaceO2) * (s ** 0.82),
+      glucose: transport.surfaceGlucose + (transport.bulkGlucose - transport.surfaceGlucose) * (s ** 0.86)
+    };
+  }
+  return { region: "bulk", oxygen: transport.bulkO2, glucose: transport.bulkGlucose };
+}
+
 function computeTransport(gravity, tissue, geometry, counts, day, perturbations) {
   const gravityProfile = GRAVITY_PROFILES[gravity];
   const tissueProfile = TISSUE_PROFILES[tissue];

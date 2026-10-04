@@ -445,3 +445,19 @@ button, .control-group select { transition: background-color .18s, box-shadow .1
 button:not(:disabled):hover { box-shadow: 0 4px 12px rgba(16, 34, 53, 0.12); }
 .site-footer { border-top: 1px solid var(--line); }
 @media (prefers-reduced-motion: reduce) { button, .control-group select { transition: none; } }
+
+/* ---- Radial profile bands and viewer scale bar ---- */
+.profile-band.lumen { fill: rgba(247, 244, 238, 0.95); }
+.profile-band.tissue { fill: rgba(15, 121, 200, 0.10); }
+.profile-band.depletion { fill: rgba(128, 212, 208, 0.22); }
+.profile-band.bulk { fill: rgba(235, 242, 247, 0.7); }
+.profile-region { fill: var(--ink); font-weight: 700; letter-spacing: 0.04em; }
+.profile-region.sub { font-weight: 600; fill: var(--muted); letter-spacing: 0; }
+.profile-tick, .profile-axis-title, .profile-edge-label { fill: var(--muted); }
+.profile-edge-label { fill: var(--ink); font-weight: 650; paint-order: stroke; stroke: rgba(255, 255, 255, 0.85); stroke-width: 4px; }
+.viewer-scale { position: absolute; left: 12px; bottom: 12px; display: grid; gap: 0.15rem; padding: 0.5rem 0.75rem; border-radius: 12px; background: rgba(255, 255, 255, 0.82); box-shadow: var(--shadow-card); pointer-events: none; z-index: 2; max-width: calc(100% - 24px); }
+.viewer-scale-bar { display: flex; align-items: center; gap: 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.viewer-scale-line { display: block; height: 10px; border: 2px solid var(--ink); border-top: 0; box-sizing: border-box; }
+.viewer-scale-meta { color: var(--muted); font-size: 1rem; line-height: 1.3; font-variant-numeric: tabular-nums; }
+.viewer-scale-meta span { display: block; }
+@media (max-width: 479px) { .viewer-scale { left: 8px; bottom: 8px; padding: 0.4rem 0.6rem; } .viewer-scale-meta span:last-child { display: none; } }
