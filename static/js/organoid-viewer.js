@@ -12,8 +12,8 @@ const REFERENCE_RADIUS_UM = 70;
 const FOV_FULL = 34;
 const FOV_SECTION = 18;
 const FIT_MARGIN = 1.25;
-const VISUAL_NN_RATIO = 0.59;
-const MAX_RADIUS_GAIN = 1.7;
+const VISUAL_NN_RATIO = 0.68;
+const MAX_RADIUS_GAIN = 2.1;
 const NICE_SCALES_UM = [5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000];
 const BIRTH_EASE_CELLS = 28;
 const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
@@ -131,6 +131,7 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
   let floorPlane = null;
   let cystLumen = null;
   let coreMesh = null;
+  let tissueFill = null;
   let voxelGrid = null;
   let tissueHull = null;
   let surfaceGeometry = null;
@@ -193,7 +194,7 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
     const extent = units.radius * (1 + units.aniso * 0.45);
     let bound = extent;
     const isSection = cutMode === "cross";
-    if (layers.depletion || (isSection && (layers.oxygen || layers.glucose))) bound = Math.max(bound, extent * (1 + units.layerRatio));
+    if (layers.depletion || (isSection && (layers.oxygen || layers.glucose))) bound = Math.max(bound, extent * Math.min(1 + units.layerRatio, 1.5));
     if (!isSection && layers.voxels && !layers.cells) bound = Math.max(bound, extent * 1.15);
     const fov = isSection ? FOV_SECTION : FOV_FULL;
     const aspect = lastCanvasSize.width > 0 ? lastCanvasSize.width / Math.max(1, lastCanvasSize.height) : 1;
@@ -207,6 +208,7 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
     cells.visible = layers.cells;
     tissueHull.visible = layers.cells && full;
     coreMesh.visible = layers.cells && full && targetMorphology === "solid";
+    tissueFill.visible = full && layers.cells;
     cystLumen.visible = full && targetMorphology === "cyst" && layers.cells;
     transportShell.visible = layers.depletion && full;
     transportBody.visible = (layers.oxygen || layers.glucose) && full;
@@ -308,7 +310,15 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
       xs[k] = point.x; ys[k] = point.y; zs[k] = point.z;
       if (!section || Math.abs(point.z) <= half) members.push(k);
     }
-    const nearest = new Float32Array(count).fill(Infinity);
+    const NEIGHBOURS = 4;
+    const near = new Float32Array(count * NEIGHBOURS).fill(Infinity);
+    const insert = (k, d) => {
+      const o = k * NEIGHBOURS;
+      if (d >= near[o + NEIGHBOURS - 1]) return;
+      let s = o + NEIGHBOURS - 1;
+      while (s > o && near[s - 1] > d) { near[s] = near[s - 1]; s -= 1; }
+      near[s] = d;
+    };
     for (let a = 0; a < members.length; a += 1) {
       const i = members[a];
       for (let b = a + 1; b < members.length; b += 1) {
@@ -317,14 +327,25 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
         const dy = ys[i] - ys[j];
         const dz = section ? 0 : zs[i] - zs[j];
         const dist = dx * dx + dy * dy + dz * dz;
-        if (dist < nearest[i] * nearest[i]) nearest[i] = Math.sqrt(dist);
-        if (dist < nearest[j] * nearest[j]) nearest[j] = Math.sqrt(dist);
+        const d = Math.sqrt(dist);
+        insert(i, d);
+        insert(j, d);
       }
+    }
+    const nearest = new Float32Array(count).fill(Infinity);
+    for (let k = 0; k < count; k += 1) {
+      let sum = 0;
+      let n = 0;
+      for (let q = 0; q < NEIGHBOURS; q += 1) {
+        const d = near[k * NEIGHBOURS + q];
+        if (Number.isFinite(d)) { sum += d; n += 1; }
+      }
+      if (n) nearest[k] = sum / n;
     }
     const radius = new Float32Array(count);
     for (let k = 0; k < count; k += 1) {
       radius[k] = Number.isFinite(nearest[k])
-        ? clamp(nearest[k] * VISUAL_NN_RATIO, base * 0.62, base * MAX_RADIUS_GAIN)
+        ? clamp(nearest[k] * VISUAL_NN_RATIO, base * 0.8, base * MAX_RADIUS_GAIN)
         : base;
     }
     Object.assign(spacingCache, { key, radius, half, base, layerCount, inner });
@@ -392,8 +413,10 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
     const image = context.createImageData(size, size);
     const extentUm = geometry.radiusUm + transport.boundaryLayerUm;
     const fields = layers.oxygen || layers.glucose;
-    const tissue = [207, 224, 226];
+    const tissue = layers.cells ? [88, 138, 172] : [207, 224, 226];
     const tint = new THREE.Color();
+    const TABLE = 512;
+    const table = Array.from({ length: TABLE + 1 }, (_, i) => radialFieldAt(transport, geometry, (i / TABLE) * extentUm));
     for (let py = 0; py < size; py += 1) {
       for (let px = 0; px < size; px += 1) {
         const nx = ((px + 0.5) / size) * 2 - 1;
@@ -401,7 +424,7 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
         const rr = Math.hypot(nx, ny);
         const offset = (py * size + px) * 4;
         if (rr > 1) continue;
-        const field = radialFieldAt(transport, geometry, rr * extentUm);
+        const field = table[Math.round(rr * TABLE)];
         let rgb = null;
         let alpha = 0;
         if (field.region === 'lumen') {
@@ -521,6 +544,7 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
     coreMesh.scale.setScalar(Math.max(0.04, radius * state.geometry.necroticCoreRadiusUm / Math.max(state.geometry.radiusUm, 1)));
     coreMesh.material.opacity = Math.min(0.4, state.transport.hypoxicFraction * 0.42);
     cystLumen.scale.setScalar(Math.max(0.01, radius * units.inner));
+    tissueFill.scale.setScalar(pool.morphology === 'cyst' ? radius * (units.inner + (1 - units.inner) * 0.5) : radius * 0.94);
     transportShell.scale.setScalar(radius * (1 + units.layerRatio));
     tissueHull.scale.setScalar(radius);
     transportBody.scale.setScalar(radius);
@@ -649,8 +673,8 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
       organoid = new THREE.Group();
       scene.add(organoid);
       surfaceGeometry = makeIrregularSurface(currentState?.tissue || "generic", currentState?.geometry.anisotropy || 0.1);
-      const cellMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.94, metalness: 0, flatShading: true });
-      cells = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 1), cellMaterial, PARTICLE_CAPACITY);
+      const cellMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.85, metalness: 0 });
+      cells = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 3), cellMaterial, PARTICLE_CAPACITY);
       cells.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
       cells.frustumCulled = false;
       organoid.add(cells);
@@ -660,6 +684,9 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
       cystLumen = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 16),
         new THREE.MeshBasicMaterial({ color: 0xf7f4ee, transparent: true, opacity: 0.9 }));
       organoid.add(cystLumen);
+      tissueFill = new THREE.Mesh(new THREE.SphereGeometry(1, 48, 32),
+        new THREE.MeshStandardMaterial({ color: 0x3f7f94, roughness: 0.9, metalness: 0 }));
+      organoid.add(tissueFill);
       tissueHull = new THREE.Mesh(surfaceGeometry, new THREE.MeshBasicMaterial({
         color: 0x7ca9a4, transparent: true, opacity: 0.045, depthWrite: false, side: THREE.DoubleSide }));
       organoid.add(tissueHull);
@@ -680,10 +707,13 @@ export function createOrganoidViewer(canvas, fallbackCanvas, fallbackWrap) {
       floorPlane.rotation.x = -Math.PI / 2;
       organoid.add(floorPlane);
       sectionCanvas = document.createElement("canvas");
-      sectionCanvas.width = 192;
-      sectionCanvas.height = 192;
+      sectionCanvas.width = 640;
+      sectionCanvas.height = 640;
       sectionTexture = new THREE.CanvasTexture(sectionCanvas);
       sectionTexture.colorSpace = THREE.SRGBColorSpace;
+      sectionTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      sectionTexture.generateMipmaps = false;
+      sectionTexture.minFilter = THREE.LinearFilter;
       sectionDisc = new THREE.Mesh(new THREE.PlaneGeometry(2, 2),
         new THREE.MeshBasicMaterial({ map: sectionTexture, transparent: true, depthWrite: false }));
       sectionDisc.visible = false;
