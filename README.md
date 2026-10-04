@@ -54,3 +54,8 @@ The website uses these bundled records as its runtime science data.
   their assets.
 - `app.py`, `templates/`, and `static/` contain the interactive experiment.
 - `data/` contains the small provenance records required by the Flask app.
+
+## Deploy on Render
+
+The repo includes [render.yaml](render.yaml). Create a Render Blueprint (or a Web Service) from this repository. Build: `pip install -r requirements.txt`. Start: `gunicorn app:app --bind 0.0.0.0:$PORT`.
+
